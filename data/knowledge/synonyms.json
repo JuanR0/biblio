@@ -1,0 +1,12 @@
+{
+  "préstamo": ["préstamo", "prestar", "retirar", "sacar libro", "tomar libro"],
+  "libro": ["libro", "ejemplar", "volumen", "texto", "obra"],
+  "devolver": ["devolver", "entregar", "regresar", "retornar"],
+  "multa": ["multa", "sanción", "penalización", "recargo", "castigo"],
+  "renovar": ["renovar", "prorrogar", "extender", "prolongar", "ampliar"],
+  "tiempo": ["tiempo", "duración", "plazo", "período"],
+  "días": ["días", "días hábiles", "jornadas"],
+  "horario": ["horario", "horas", "horas de atención", "tiempo de atención", "jornada"],
+  "abrir": ["abrir", "abierto", "apertura", "comienzo", "inicio"],
+  "cerrar": ["cerrar", "cerrado", "cierre", "final", "fin"]
+}

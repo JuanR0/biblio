@@ -5,15 +5,22 @@
       "id": "prestamos_001",
       "topic": "límite",
       "answer": "Puedes tener hasta 5 libros prestados simultáneamente.",
-      "keywords": ["cuántos libros", "máximo", "límite", "cantidad"],
+      "keywords": ["libros", "ejemplares", "máximo", "límite", "cantidad", "cuántos"],
       "confidence": 0.95
     },
     {
       "id": "prestamos_002", 
       "topic": "duración",
       "answer": "Los préstamos son por 15 días hábiles.",
-      "keywords": ["tiempo", "días", "plazo", "cuánto tiempo"],
+      "keywords": ["tiempo", "duración", "plazo", "cuánto tiempo", "días"],
       "confidence": 0.9
+    },
+    {
+      "id": "prestamos_003",
+      "topic": "devolución",
+      "answer": "Los libros deben ser devueltos en el mostrador principal.",
+      "keywords": ["devolver", "entregar", "regresar", "retornar", "donde entregar"],
+      "confidence": 0.85
     }
   ]
 }

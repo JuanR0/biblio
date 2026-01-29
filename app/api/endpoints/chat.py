@@ -68,3 +68,26 @@ async def test_nlp(
         "input": text,
         "processed": result
     }
+
+@router.get("/synonyms/{word}")
+async def get_synonyms(
+    word: str,
+    nlp_service: NLPService = Depends(get_nlp_service)
+):
+    """Obtiene sinónimos de una palabra"""
+    synonyms = nlp_service.get_synonym_suggestions(word)
+    return {
+        "word": word,
+        "synonyms": synonyms,
+        "count": len(synonyms)
+    }
+
+@router.post("/analyze-synonyms")
+async def analyze_synonyms(
+    question: str,
+    word: str,
+    nlp_service: NLPService = Depends(get_nlp_service)
+):
+    """Analiza cómo se relaciona una palabra con sus sinónimos en una pregunta"""
+    analysis = nlp_service.analyze_synonym_match(question, word)
+    return analysis
