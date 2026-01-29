@@ -1,0 +1,19 @@
+{
+  "category": "préstamos",
+  "topics": [
+    {
+      "id": "prestamos_001",
+      "topic": "límite",
+      "answer": "Puedes tener hasta 5 libros prestados simultáneamente.",
+      "keywords": ["cuántos libros", "máximo", "límite", "cantidad"],
+      "confidence": 0.95
+    },
+    {
+      "id": "prestamos_002", 
+      "topic": "duración",
+      "answer": "Los préstamos son por 15 días hábiles.",
+      "keywords": ["tiempo", "días", "plazo", "cuánto tiempo"],
+      "confidence": 0.9
+    }
+  ]
+}
