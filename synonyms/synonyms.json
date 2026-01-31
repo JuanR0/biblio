@@ -1,0 +1,12 @@
+{
+  "libro": ["texto", "volumen", "obra", "tomo", "ejemplar"],
+  "computadora": ["ordenador", "pc", "equipo", "máquina", "dispositivo"],
+  "cubiculo": ["sala", "cabina", "área", "lugar", "habitación", "recinto", "espacio"],
+  "prestar": ["llevar", "sacar", "tomar prestado"],
+  "reservar": ["apartar", "agendar", "solicitar", "separar"],
+  "conseguir": ["obtener", "lograr", "alcanzar"],
+  "usar": ["utilizar", "emplear", "manejar"],
+  "multa": ["sanción", "penalización", "recargo"],
+  "baño": ["wc", "sanitario", "servicio", "aseo"],
+  "horario": ["schedule", "tiempo", "jornada"]
+}

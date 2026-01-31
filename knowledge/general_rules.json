@@ -1,0 +1,19 @@
+{
+  "horario": {
+    "preguntas": [
+      "¿cuál es el horario?",
+      "¿a qué hora abren?",
+      "horario de atención",
+      "¿cuándo cierran?"
+    ],
+    "respuesta": "La biblioteca atiende de lunes a viernes de 8:00 a 20:00, sábados de 9:00 a 14:00."
+  },
+  "ubicaciones": {
+    "preguntas": [
+      "¿dónde está el baño?",
+      "ubicación del WC",
+      "¿dónde están los servicios?"
+    ],
+    "respuesta": "Los baños se encuentran en el primer piso, al lado de la sala de lectura."
+  }
+}

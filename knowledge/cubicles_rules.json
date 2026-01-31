@@ -1,0 +1,50 @@
+{
+  "reserva_cubiculos": {
+    "preguntas": [
+      "¿cómo reservo un cubículo?",
+      "quiero reservar una sala de estudio",
+      "procedimiento para cabina",
+      "reservar espacio silencioso",
+      "¿puedo apartar un cubiculo?",
+      "reservación de área de estudio",
+      "cómo conseguir un cubiculo"
+    ],
+    "respuesta": "Puedes reservar cubículos en la recepción de la biblioteca. Se permite 1 reserva por día de máximo 3 horas. Trae tu carné de estudiante."
+  },
+  "reglas_cubiculos": {
+    "preguntas": [
+      "¿qué reglas hay en los cubículos?",
+      "normas salas estudio",
+      "reglamento cubículos",
+      "¿se puede hablar en los cubículos?",
+      "¿cuántas personas caben en un cubiculo?"
+    ],
+    "respuesta": "Los cubículos son espacios silenciosos. No se permite hablar en voz alta. Máximo 2 personas por cubiculo. No dejar pertenencias desatendidas."
+  },
+  "disponibilidad_cubiculos": {
+    "preguntas": [
+      "¿hay cubículos disponibles?",
+      "disponibilidad de salas",
+      "¿siempre hay cubículos libres?",
+      "horario cubículos",
+      "¿a qué hora hay más disponibilidad?"
+    ],
+    "respuesta": "La disponibilidad varía según la hora. Horas pico: 2 PM a 6 PM. Recomendamos venir temprano. Consulta disponibilidad en recepción."
+  },
+   "multas_cubiculos": {
+    "preguntas": [
+      "¿hay multa por exceder el tiempo en el cubículo?",
+      "multa por cubiculo",
+      "sanción por no liberar el espacio",
+      "¿qué pasa si me paso del tiempo en la sala?",
+      "penalización cubiculos",
+      "recargo por tiempo extra",
+      "¿cuánto es la multa por cubiculo?",
+      "cobro por exceder tiempo",
+      "pago por uso extendido",
+      "¿hay cargo extra si no salgo a tiempo?",
+      "multa por ocupar más tiempo del permitido"
+    ],
+    "respuesta": "Sí, hay multa por exceder el tiempo en cubículos. La penalización es de $50 por cada 15 minutos adicionales. Después de 30 minutos de retraso, perderás el derecho a reservar por una semana."
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "uso_computadoras": {
+    "preguntas": [
+      "¿cómo uso una computadora?",
+      "quiero usar un ordenador",
+      "acceso a equipos",
+      "¿puedo usar las PCs?",
+      "cómo utilizar computadora",
+      "necesito computadora"
+    ],
+    "respuesta": "Las computadoras están disponibles por orden de llegada. Máximo 2 horas por persona. Presenta tu carné en el área de tecnología."
+  },
+  "reserva_computadoras": {
+    "preguntas": [
+      "¿cómo reservo una computadora?",
+      "reservar ordenador",
+      "apartar equipo",
+      "¿puedo reservar PC?",
+      "reservación de computadoras"
+    ],
+    "respuesta": "No se aceptan reservas previas. Las computadoras son por orden de llegada. Horario preferencial: antes de las 11 AM."
+  },
+  "reglas_computadoras": {
+    "preguntas": [
+      "¿qué reglas hay para computadoras?",
+      "normas uso ordenadores",
+      "reglamento equipos",
+      "prohibiciones computadoras",
+      "¿se puede comer junto a las computadoras?"
+    ],
+    "respuesta": "Prohibido comer o beber cerca de los equipos. No descargar software. No modificar configuraciones. Uso académico únicamente."
+  } 
+}

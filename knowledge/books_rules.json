@@ -1,0 +1,22 @@
+{
+  "multas_libros": {
+    "preguntas": [
+      "multa por libro atrasado",
+      "¿cuánto es la multa?",
+      "retraso en devolución"
+    ],
+    "respuesta": "La multa por libro atrasado es de $100 por día de retraso."
+  },
+  "prestamo_libros": {
+    "preguntas": [
+      "¿cómo presto un libro?",
+      "préstamo de libros",
+      "quiero llevar un texto",
+      "tomar prestado un volumen",
+      "cómo me llevo un libro",
+      "procedimiento para préstamo de obras",
+      "necesito un libro de la biblioteca"
+    ],
+    "respuesta": "Puedes prestar hasta 3 libros por 15 días. Se requiere carné vigente."
+  }
+}
