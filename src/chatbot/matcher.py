@@ -9,7 +9,6 @@ class QueryMatcher:
         self.synonyms_path = synonyms_path
         self.synonyms = {}
         
-        # STOP WORDS MEJORADAS - excluir verbos comunes que causan confusión
         self.stop_words = {
             'cómo', 'cuál', 'dónde', 'qué', 'cuánto', 'cuánta', 'cuántos', 'cuántas',
             'para', 'por', 'con', 'sin', 'sobre', 'bajo', 'entre', 'hacia', 'desde',
@@ -21,12 +20,11 @@ class QueryMatcher:
             'como', 'cuando', 'donde', 'mientras', 'aunque', 'porque', 'si',
             'sí', 'no', 'también', 'además', 'entonces', 'luego', 'ahora',
             'antes', 'después', 'siempre', 'nunca', 'a veces', 'quizás',
-            # Verbos comunes que causan confusión entre categorías
             'conseguir', 'obtener', 'tener', 'hacer', 'usar', 'utilizar',
             'necesitar', 'querer', 'poder', 'deber', 'saber', 'conocer'
         }
         
-        # Palabras que NUNCA deben ser sinónimas entre categorías
+        # Palabras mutuamente excluyentes, no pueden ser sinonimas entre categorias
         self.exclusive_words = {
             "libro": ["computadora", "cubiculo", "equipo", "sala"],
             "computadora": ["libro", "cubiculo", "texto", "obra"],
@@ -42,19 +40,17 @@ class QueryMatcher:
             with open(filepath, 'r', encoding='utf-8') as f:
                 self.synonyms = json.load(f)
             
-            # Limpiar sinónimos problemáticos
-            self._clean_synonyms()
+            self.clean_synonyms()
             
         except Exception as e:
             print(f"❌ Error cargando sinónimos: {e}")
             self.synonyms = {}
     
-    def _clean_synonyms(self):
-        """Limpia sinónimos que puedan causar confusión entre categorías"""
+    def clean_synonyms(self):
+        """Limpia sinonimos que puedan causar confusión entre categorías"""
         # NO permitir que 'conseguir' sea sinónimo de 'prestar' para libros
         if "conseguir" in self.synonyms and "prestar" in self.synonyms["conseguir"]:
             self.synonyms["conseguir"].remove("prestar")
-            print("⚠️  Removido sinónimo problemático: 'conseguir' -> 'prestar'")
     
     def normalize_text(self, text: str) -> str:
         """Normaliza el texto manteniendo palabras clave importantes"""
@@ -66,11 +62,11 @@ class QueryMatcher:
         # Mantener palabras clave importantes sin modificar
         important_words = ["cubiculo", "libro", "computadora", "reserva", "prestamo"]
         
-        # Reemplazar sinónimos problemáticos ANTES de normalizar
+        # Reemplazar sinónimos problematicos 
         problematic_synonyms = {
-            "conseguir": "reservar",  # Para preguntas de cubículos
+            "conseguir": "reservar",
             "obtener": "reservar",
-            "tomar": "prestar"  # Solo para libros
+            "tomar": "prestar"
         }
         
         for problematic, replacement in problematic_synonyms.items():
@@ -92,7 +88,7 @@ class QueryMatcher:
         return text
     
     def expand_with_synonyms(self, query: str) -> List[str]:
-        """Expande la consulta de forma INTELIGENTE"""
+        """Expande la consulta incluyendo sinonimos"""
         normalized = self.normalize_text(query)
         
         if not normalized:
@@ -101,11 +97,11 @@ class QueryMatcher:
         words = normalized.split()
         expanded_queries = [normalized]
         
-        # PRIMERO: Si contiene palabra clave de categoría, NO expandir esa palabra
+        # En caso de palabra clave de categoria, no expandir
         category_keywords = ["cubiculo", "libro", "computadora"]
         
         for i, word in enumerate(words):
-            # Si es palabra de categoría, no expandir con sinónimos
+            # En caso de palabra de categoria, no expandir con sinonimos
             if word in category_keywords:
                 continue
                 
@@ -116,7 +112,7 @@ class QueryMatcher:
                     new_words[i] = synonym
                     expanded_queries.append(' '.join(new_words))
         
-        # Agregar versión sin stop words (pero mantener palabras clave)
+        # Agregar versión sin stop words, manteniendo palabras clave
         important_words = []
         for word in words:
             if word not in self.stop_words or word in category_keywords:
@@ -137,7 +133,7 @@ class QueryMatcher:
         return unique_queries
     
     def calculate_similarity(self, queries: List[str], target_phrases: List[str]) -> float:
-        """Calcula similitud con PENALIZACIÓN por categorías cruzadas"""
+        """Calcula similitud con penalizacion por categorías cruzadas"""
         if not queries or not target_phrases:
             return 0.0
         
@@ -157,17 +153,17 @@ class QueryMatcher:
                 phrase_normalized = self.normalize_text(phrase)
                 phrase_words = set(phrase_normalized.split())
                 
-                # 1. Coincidencia de palabras clave CRÍTICAS
+                # Comprobacion de palabras criticas
                 critical_words_query = query_words & {"cubiculo", "libro", "computadora"}
                 critical_words_phrase = phrase_words & {"cubiculo", "libro", "computadora"}
                 
-                # PENALIZAR si las palabras críticas no coinciden
+                # Penalizacion en ausencia de coincidencias para palabras criticas
                 if critical_words_query and critical_words_phrase:
                     if critical_words_query != critical_words_phrase:
-                        # Diferentes categorías - penalización severa
-                        continue  # Saltar esta comparación completamente
+                  
+                        continue  
                 
-                # 2. Similitud Jaccard (solo palabras no-stop)
+                # Similitud Jaccard 
                 query_content = query_words - self.stop_words
                 phrase_content = phrase_words - self.stop_words
                 
@@ -179,23 +175,23 @@ class QueryMatcher:
                     if union > 0:
                         keyword_similarity = intersection / union
                 
-                # 3. Similitud textual
+                # Similitud textual
                 textual_similarity = SequenceMatcher(
                     None, 
                     query_normalized, 
                     phrase_normalized
                 ).ratio()
                 
-                # 4. Bonus por coincidencia exacta de verbos importantes
+                # Bonus por coincidencia de verbos importantes
                 action_verbs = {"reservar", "prestar", "usar", "devolver"}
                 common_actions = query_content & phrase_content & action_verbs
                 bonus = len(common_actions) * 0.05
                 
-                # 5. Penalización si la frase objetivo NO contiene palabras clave de la query
+                # Penalización por no contener en la frase palabras clave
                 if critical_words_query and not (critical_words_query & phrase_words):
-                    bonus -= 0.3  # Penalización grande
+                    bonus -= 0.3  
                 
-                # 6. Combinar
+                # Combinar
                 combined = (keyword_similarity * 0.7) + (textual_similarity * 0.2) + bonus
                 combined = max(0.0, combined)  # No negativa
                 

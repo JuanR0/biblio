@@ -16,20 +16,29 @@
       "¿qué reglas hay en los cubículos?",
       "normas salas estudio",
       "reglamento cubículos",
-      "¿se puede hablar en los cubículos?",
+      "¿se puede hablar en los cubiculos?",
       "¿cuántas personas caben en un cubiculo?"
     ],
-    "respuesta": "Los cubículos son espacios silenciosos. No se permite hablar en voz alta. Máximo 2 personas por cubiculo. No dejar pertenencias desatendidas."
+    "respuesta": "Los cubículos son espacios silenciosos. No se permite hablar en voz alta."
   },
   "disponibilidad_cubiculos": {
     "preguntas": [
-      "¿hay cubículos disponibles?",
-      "disponibilidad de salas",
+      "cubiculos triangulares gratis",
+      "disponibilidad de salas redondas",
       "¿siempre hay cubículos libres?",
-      "horario cubículos",
-      "¿a qué hora hay más disponibilidad?"
+      "horario cubiculos",
+      "¿a que hora hay mas disponibilidad de cubiculos?"
     ],
     "respuesta": "La disponibilidad varía según la hora. Horas pico: 2 PM a 6 PM. Recomendamos venir temprano. Consulta disponibilidad en recepción."
+  },
+   "limite_usuarios_cubiculos": {
+    "preguntas": [
+      "¿Cuantos usuarios se necesitan para usar un cubiculo?",
+      "¿Cual es el maximo de usuarios para usar un cubiculo?",
+      "¿Cual es el minimo de usuarios para usar un cubiculo?",
+      "limite de usuarios por cubiculo"
+    ],
+    "respuesta": "Minimo 4 personas por cubiculo, maximo 4."
   },
    "multas_cubiculos": {
     "preguntas": [

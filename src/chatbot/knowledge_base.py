@@ -16,7 +16,7 @@ class KnowledgeBase:
         """Carga un archivo JSON de conocimiento con manejo de errores"""
         filepath = os.path.join(self.knowledge_path, filename)
         
-        # Verificar si el archivo existe
+        # Asegurarse de que el archivo existe
         if not os.path.exists(filepath):
             print(f"❌ Archivo no encontrado: {filepath}")
             return None
@@ -25,7 +25,7 @@ class KnowledgeBase:
             with open(filepath, 'r', encoding='utf-8') as f:
                 content = json.load(f)
             
-            # Validar estructura básica
+            # Solo acepta archivos JSON 
             if not isinstance(content, dict):
                 print(f"❌ Estructura inválida en {filename}: debe ser un objeto JSON")
                 return None
@@ -57,18 +57,17 @@ class KnowledgeBase:
                 self.knowledge[category] = knowledge_data
                 print(f"   ✅ {len(knowledge_data)} reglas cargadas para {category}")
             else:
-                print(f"   ⚠️  No se pudo cargar conocimiento para {category}")
+                print(f"   ⚠️  Las relgas no han sido encontradas {category}")
                 
-                # Crear estructura vacía para evitar errores
                 self.knowledge[category] = {}
                 
-                # Si es un archivo crítico, crear datos de ejemplo
+                # Datos de ejemplo como respaldo
                 if category in ["computers", "cubicles"]:
                     print(f"   📝 Creando datos de ejemplo para {category}...")
                     self.knowledge[category] = self._create_example_data(category)
     
     def _create_example_data(self, category: str) -> Dict:
-        """Crea datos de ejemplo si no se encuentran los archivos"""
+        """Datos de ejemplo en caso de no encontrar los archivos de conocimiento"""
         if category == "computers":
             return {
                 "uso_computadoras": {
@@ -86,13 +85,13 @@ class KnowledgeBase:
         return {}
     
     def get_knowledge(self, category: str) -> Dict:
-        """Obtiene conocimiento de una categoría específica"""
+        """Obtiene conocimiento de una categoría especifica"""
         return self.knowledge.get(category, {})
     
     def list_loaded_categories(self):
-        """Lista las categorías cargadas y sus reglas"""
+        """Lista las categorias cargadas y sus reglas"""
         print("\n" + "="*50)
-        print("CATEGORÍAS CARGADAS")
+        print("CATEGORIAS CARGADAS")
         print("="*50)
         
         for category, data in self.knowledge.items():
@@ -103,4 +102,4 @@ class KnowledgeBase:
                     print(f"   ├─ {key}: {len(preguntas)} preguntas")
                     print(f"   └─ Ejemplo: {preguntas[0] if preguntas else 'Sin preguntas'}")
             else:
-                print(f"\n📁 {category.upper()}: VACÍO o NO CARGADO")
+                print(f"\n📁 {category.upper()}: VACIO O NO CARGADO")

@@ -8,12 +8,51 @@
     ],
     "respuesta": "La biblioteca atiende de lunes a viernes de 8:00 a 20:00, sábados de 9:00 a 14:00."
   },
-  "ubicaciones": {
+  "ubicaciones_banos": {
     "preguntas": [
-      "¿dónde está el baño?",
-      "ubicación del WC",
-      "¿dónde están los servicios?"
+      "¿donde encuentro el WC?",
+      "¿donde se encuentra el wc?",
+      "¿donde esta el baño?",
+      "¿donde busco el inodoro?",
+      "¿dónde están los servicios?",
+      "espectaculo de cuero y latigo como jamas has visto",
+      "necesito hacer un deposito en banorte"
+      
     ],
     "respuesta": "Los baños se encuentran en el primer piso, al lado de la sala de lectura."
+  },
+  "ubicaciones_atencion_usuarios": {
+    "preguntas": [
+      "¿donde se encuentra atencion a usuarios?",
+      "¿donde puedo encontrar atencion a usuarios?",
+      "¿donde se ubica atencion a usuarios?",
+      "¿donde atienden usuarios?"
+    ],
+    "respuesta": "Pasando el escritorio de recepción al ingresar, a mano derecha."
+  },
+  "solicitar_salon_usos_multiples": {
+    "preguntas": [
+      "¿donde puedo solicitar el salon de usos multiples?",
+      "¿donde apartar el salon de usos multiples?",
+      "¿a quien puedo solicitar el salon de usos multiples?",
+      "¿Necesito informacion sobre el salon de usos multiples?",
+      "¿donde atienden usuarios?"
+    ],
+    "respuesta": "En la oficina de atencion a usuarios."
+  },
+  "ingreso_alimento_y_bebida": {
+    "preguntas": [
+      "¿Puedo ingresar con alimentos?",
+      "¿Puedo ingresar con bebidas?"
+    ],
+    "respuesta": "Solo se permite ingresar con alimentos o bebidas en contenedores cerrados."
+  },
+  "ingerir_alimento_y_bebida": {
+    "preguntas": [
+      "¿Puedo ingerir alimentos?",
+      "¿Puedo consumir bebidas?",
+      "¿Puedo comer en la biblioteca?"
+    ],
+    "respuesta": "Solo se permite la ingesta de agua natural con la debida precaución, el cosnumo de otros alimentos y bebidas dentro de la biblitoeca esta prohibido."
   }
 }

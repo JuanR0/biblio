@@ -4,10 +4,10 @@ from src.api.endpoints import router as chatbot_router
 
 app = FastAPI(title="Library Chatbot Microservice")
 
-# Configurar CORS para permitir conexión desde el backend principal
+# Placeholder CORS, para permitir conexión desde el programa principal principal
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8000"],  # URL de tu backend principal
+    allow_origins=["http://localhost:8001"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

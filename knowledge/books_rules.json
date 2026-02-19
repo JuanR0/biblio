@@ -2,18 +2,18 @@
   "multas_libros": {
     "preguntas": [
       "multa por libro atrasado",
-      "¿cuánto es la multa?",
-      "retraso en devolución"
+      "¿cuánto es la multa de libro?",
+      "retraso en devolucion"
     ],
     "respuesta": "La multa por libro atrasado es de $100 por día de retraso."
   },
   "prestamo_libros": {
     "preguntas": [
-      "¿cómo presto un libro?",
+      "¿como presto un libro?",
       "préstamo de libros",
       "quiero llevar un texto",
       "tomar prestado un volumen",
-      "cómo me llevo un libro",
+      "como me llevo un libro",
       "procedimiento para préstamo de obras",
       "necesito un libro de la biblioteca"
     ],
