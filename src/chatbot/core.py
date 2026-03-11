@@ -60,7 +60,7 @@ class ChatBot:
             }
         }
         
-        self.debug_mode = True
+        self.debug_mode = False
     
     def _init_spacy(self):
         """Inicializa Spacy si está disponible"""
@@ -244,8 +244,63 @@ class ChatBot:
         
         return best_category, normalized_score
 
+    def extract_entities(self, question: str) -> Dict[str, List[str]]:
+        """
+        Extraccion de entidades especificas de biblioteca.
+        """
+        # Normalizacion y lematizacion de la prgunta
+        question_norm = self.matcher.normalize_text(question)
+        lemmas = []
+        if self.use_spacy and hasattr(self, 'nlp'):
+            try:
+                doc = self.nlp(question)
+                lemmas = [token.lemma_.lower() for token in doc 
+                        if not token.is_stop and not token.is_punct]
+                if self.debug_mode:
+                    print(f"🔍 Lemmas: {lemmas}")
+            except Exception as e:
+                if self.debug_mode:
+                    print(f"⚠️ Error de lemmatizacion: {e}")
+
+        words = question_norm.split()
+        
+        entities = {
+            "locations": [],
+            "resources": [],
+            "actions": [],
+            "time_related": [],
+            "urgency": []
+        }
+        
+        # Formas base para el mapeo de entidad 
+        location_keywords = {"cubiculo", "sala", "cabina", "espacio", "area"}
+        resource_keywords = {"libro", "computadora", "ordenador", "texto", "obra", "volumen"}
+        action_keywords = {"reservar", "prestar", "devolver", "usar", "utilizar", "solicitar"}
+        time_keywords = {"hora", "dia", "plazo", "tiempo", "minuto"}
+        urgency_keywords = {"urgente", "problema", "multa", "cobro", "error", "emergencia"}
+        
+        # Comparacion de palabras 
+        all_words_to_check = words + lemmas 
+        
+        for word in all_words_to_check:
+            word_lower = word.lower()
+            
+            # Check against base forms
+            if word_lower in location_keywords and word_lower not in entities["locations"]:
+                entities["locations"].append(word_lower)
+            elif word_lower in resource_keywords and word_lower not in entities["resources"]:
+                entities["resources"].append(word_lower)
+            elif word_lower in action_keywords and word_lower not in entities["actions"]:
+                entities["actions"].append(word_lower)
+            elif word_lower in time_keywords and word_lower not in entities["time_related"]:
+                entities["time_related"].append(word_lower)
+            elif word_lower in urgency_keywords and word_lower not in entities["urgency"]:
+                entities["urgency"].append(word_lower)
+        
+        return {k: v for k, v in entities.items() if v}
+
     def expand_query_with_spacy(self, query: str) -> List[str]:
-        """Expande consultas usando lematización de Spacy - VERSIÓN SEGURA"""
+        """Expande consultas usando lematización de Spacy"""
         # Usar metodo tradicional
         traditional_expanded = self.matcher.expand_with_synonyms(query.lower())
         expanded_queries = list(set(traditional_expanded))  
@@ -453,11 +508,14 @@ class ChatBot:
             print(f"   Confianza final: {final_confidence:.3f}")
             print(f"{'='*60}\n")
         
+        entities = self.extract_entities(question)
+        
         return {
             "answer": best_answer,
             "confidence": round(final_confidence, 3),
             "source": best_source,
             "mode": "basic" if not self.use_spacy else "spacy",
+            "entities": entities, 
             "details": {
                 "category_confidence": round(category_confidence, 3),
                 "expanded_queries_count": len(expanded_queries)

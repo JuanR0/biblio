@@ -34,13 +34,32 @@ class QueryMatcher:
         self.debug = False
     
     def load_synonyms(self):
-        """Carga el archivo de sinónimos con validación"""
+        """Carga el archivo de sinónimos y los hace bidireccionales"""
         try:
             filepath = os.path.join(self.synonyms_path, "synonyms.json")
             with open(filepath, 'r', encoding='utf-8') as f:
-                self.synonyms = json.load(f)
+                one_way_synonyms = json.load(f)
+            
+            # Convertir a bidireccionales
+            self.synonyms = {}
+            for word, synonym_list in one_way_synonyms.items():
+                # Asegurar que la palabra principal existe
+                if word not in self.synonyms:
+                    self.synonyms[word] = []
+                
+                # Agregar sinónimos a la palabra principal
+                for synonym in synonym_list:
+                    if synonym not in self.synonyms[word]:
+                        self.synonyms[word].append(synonym)
+                    
+                    # Hacerlo bidireccional: el sinónimo también apunta a la palabra principal
+                    if synonym not in self.synonyms:
+                        self.synonyms[synonym] = []
+                    if word not in self.synonyms[synonym]:
+                        self.synonyms[synonym].append(word)
             
             self.clean_synonyms()
+            print(f"✅ Sinónimos bidireccionales cargados: {len(self.synonyms)} palabras")
             
         except Exception as e:
             print(f"❌ Error cargando sinónimos: {e}")
@@ -88,7 +107,7 @@ class QueryMatcher:
         return text
     
     def expand_with_synonyms(self, query: str) -> List[str]:
-        """Expande la consulta incluyendo sinonimos"""
+        """Expande la consulta incluyendo sinónimos bidireccionalmente"""
         normalized = self.normalize_text(query)
         
         if not normalized:
@@ -97,20 +116,26 @@ class QueryMatcher:
         words = normalized.split()
         expanded_queries = [normalized]
         
-        # En caso de palabra clave de categoria, no expandir
+        # Palabras que no deben expandirse (categorías principales)
         category_keywords = ["cubiculo", "libro", "computadora"]
         
         for i, word in enumerate(words):
-            # En caso de palabra de categoria, no expandir con sinonimos
+            # No expandir palabras de categoría
             if word in category_keywords:
                 continue
                 
-            # Expandir solo verbos/acciones comunes
+            # Buscar sinonimos bidireccionalmente
             if word in self.synonyms and len(word) > 2:
-                for synonym in self.synonyms[word][:1]:  # Solo 1 sinónimo
-                    new_words = words.copy()
-                    new_words[i] = synonym
-                    expanded_queries.append(' '.join(new_words))
+                # Permitir hasta 2 sinónimos
+                synonyms_to_try = self.synonyms[word][:2]
+                
+                for synonym in synonyms_to_try:
+                    if synonym != word:  # Evitar autoreemplazo
+                        new_words = words.copy()
+                        new_words[i] = synonym
+                        expanded = ' '.join(new_words)
+                        if expanded not in expanded_queries:
+                            expanded_queries.append(expanded)
         
         # Agregar versión sin stop words, manteniendo palabras clave
         important_words = []
@@ -119,16 +144,18 @@ class QueryMatcher:
                 important_words.append(word)
         
         if important_words and ' '.join(important_words) != normalized:
-            expanded_queries.append(' '.join(important_words))
+            important_query = ' '.join(important_words)
+            if important_query not in expanded_queries:
+                expanded_queries.append(important_query)
         
-        # Eliminar duplicados
+        # Eliminar duplicados manteniendo orden
         unique_queries = []
         for q in expanded_queries:
             if q not in unique_queries:
                 unique_queries.append(q)
         
         if self.debug:
-            print(f"   Consultas generadas: {unique_queries}")
+            print(f"   Consultas expandidas ({len(unique_queries)}): {unique_queries}")
         
         return unique_queries
     

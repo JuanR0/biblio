@@ -1,59 +1,101 @@
 {
   "reserva_cubiculos": {
     "preguntas": [
-      "¿cómo reservo un cubículo?",
+      "¿como reservo un cubiculo?",
       "quiero reservar una sala de estudio",
-      "procedimiento para cabina",
-      "reservar espacio silencioso",
       "¿puedo apartar un cubiculo?",
-      "reservación de área de estudio",
-      "cómo conseguir un cubiculo"
+      "quiero apartar un area de estudio",
+      "como conseguir un cubiculo"
     ],
-    "respuesta": "Puedes reservar cubículos en la recepción de la biblioteca. Se permite 1 reserva por día de máximo 3 horas. Trae tu carné de estudiante."
+    "respuesta": "Los cubículos no pueden reservarse, aunque puedes hacer fila mientras se desocupa uno."
   },
-  "reglas_cubiculos": {
+  "ocupantes_cubiculo": {
     "preguntas": [
-      "¿qué reglas hay en los cubículos?",
-      "normas salas estudio",
-      "reglamento cubículos",
-      "¿se puede hablar en los cubiculos?",
+      "¿cuantos personas pueden ocupar un cubiculo?",
+      "¿cual es la cantidad necesaria de personas para solicitar un cubiculo?",
+      "usuarios por cubiculo",
+      "¿limite de personas por cubiculo?",
       "¿cuántas personas caben en un cubiculo?"
     ],
-    "respuesta": "Los cubículos son espacios silenciosos. No se permite hablar en voz alta."
+    "respuesta": "Se necesita un mínimo de usuarios para solicitar un cubículo es de 4, y el máximo es de 6."
   },
-  "disponibilidad_cubiculos": {
+  "entregar_cubiculos": {
     "preguntas": [
-      "cubiculos triangulares gratis",
-      "disponibilidad de salas redondas",
-      "¿siempre hay cubículos libres?",
-      "horario cubiculos",
-      "¿a que hora hay mas disponibilidad de cubiculos?"
+      "¿que proceso se debe seguir para entregar un cubiculo?",
+      "¿debemos estar todos presentes para entregar un cubiculo?",
+      "¿puede solo una persona entregar el cubiculo?",
+      "¿que pasa si no todos estamos presentes a la hora de entregar un cubiculo?",
+      "¿como se entrega un cubiculo?"
     ],
-    "respuesta": "La disponibilidad varía según la hora. Horas pico: 2 PM a 6 PM. Recomendamos venir temprano. Consulta disponibilidad en recepción."
+    "respuesta": "Para evitar sanciones, todos los que solicitaron el cubículo deben estar presentes al momento de la entrega en el escritorio que se solicitó el préstamo, y el representante debe de regresar la llave para que se devuelvan las credenciales."
   },
-   "limite_usuarios_cubiculos": {
+  "alimentos_cubiculos": {
     "preguntas": [
-      "¿Cuantos usuarios se necesitan para usar un cubiculo?",
-      "¿Cual es el maximo de usuarios para usar un cubiculo?",
-      "¿Cual es el minimo de usuarios para usar un cubiculo?",
-      "limite de usuarios por cubiculo"
+      "¿se puede comer dentro de los cubiculos?",
+      "¿Se puede beber en los cubiculos?",
+      "¿las reglasd de sobre consumo de alimentos de la biblioteca tambien afecta a cubiculos?",
+      "quiero solicitar un cubiculo para comer"
     ],
-    "respuesta": "Minimo 4 personas por cubiculo, maximo 4."
+    "respuesta": "Así como en el resto del área de biblioteca, solo se pueden ingresar alimentos en empaques cerrados, y solo se puede consumir agua natural con el debido cuidado."
   },
-   "multas_cubiculos": {
+  "multas_cubiculos": {
     "preguntas": [
-      "¿hay multa por exceder el tiempo en el cubículo?",
+      "¿hay multa por exceder el tiempo en el cubiculo?",
       "multa por cubiculo",
-      "sanción por no liberar el espacio",
       "¿qué pasa si me paso del tiempo en la sala?",
-      "penalización cubiculos",
-      "recargo por tiempo extra",
       "¿cuánto es la multa por cubiculo?",
-      "cobro por exceder tiempo",
-      "pago por uso extendido",
       "¿hay cargo extra si no salgo a tiempo?",
       "multa por ocupar más tiempo del permitido"
     ],
-    "respuesta": "Sí, hay multa por exceder el tiempo en cubículos. La penalización es de $50 por cada 15 minutos adicionales. Después de 30 minutos de retraso, perderás el derecho a reservar por una semana."
+    "respuesta": "No hay multa por uso de cubículos, pero exceder el tiempo de préstamo resultará en una suspensión temporal del servicio."
+  },
+  "requisitos_prestamo_cubiculos": {
+    "preguntas": [
+      "¿que se necesita para solicitar un cubiculo?",
+      "quiero solicitar un cubiculo prestado",
+      "¿como se pide prestado un cubiculo?",
+      "¿que proceso se debe seguir para solicitar un cubiculo?"
+    ],
+    "respuesta": "Deben presentarse entre 4 y 6 usuarios activos y con credencial vigente al escritorio de préstamos para hacer la solicitud."
+  },
+  "modificar_mobiliario_cubiculos": {
+    "preguntas": [
+      "¿puedo ingresar mobiliario a los cubiculos?",
+      "¿puedo retirar mobiliario de los cubiculos?",
+      "¿se puede mover el mobiliario de los cubiculos?",
+      "quiero modificar el mobilairio de los cubiculos",
+      "¿es posible modificar el mobiliario de los cubiculos?"
+    ],
+    "respuesta": "Los usuarios tienen prohibido alterar el mobiliario de los cubículos."
+  },
+  "mobiliario_danado_cubiculos": {
+    "preguntas": [
+      "encontre mobiliario danado en el cubiculo",
+      "lo cubiculo tienen mobiliario incompleto",
+      "¿que pasa si en el cubiculo falta mobiliario?",
+      "¿que pasa si en el cubiculo encontre mobiliario danado?",
+      "¿que pasa si el mobiliario del cubiculo esta en mal estado?"
+    ],
+    "respuesta": "Debes reportarlo de inmediato al personal de la biblioteca para iniciar una investigación y deslindarse de toda responsabilidad por tal situación."
+  },
+  "limite_tiempo_cubiculos": {
+    "preguntas": [
+      "necesito un cubiculo por tiempo indefinido",
+      "quiero usar un cubiculo por varias horas",
+      "¿cuanto tiempo dura un prestamo de cubiculo?",
+      "¿por cuanto tiempo me prestaran un cubiculo?",
+      "¿Cual es el limite de tiempo para prestamo de cubiculo?"
+    ],
+    "respuesta": "El límite de tiempo para préstamo de cubículo es de horas, se puede solicitar inmediatamente después de que termina el préstamo si no hay fila."
+  },
+  "invitar_terceros_cubiculos": {
+    "preguntas": [
+      "puedo invitar a otros companeros al cubiculo?",
+      "necesito que ingresen otros companeros al cubiculo",
+      "¿quienes pueden estar presentes en el cubiculo?",
+      "¿a quienes se les permite ingresar al cubiculo?",
+      "¿como ingreso mas companeros al cubiculo?"
+    ],
+    "respuesta": "En el cubículo solo pueden ingresar las personas que solicitaron el préstamo, no está permitido ingresar a terceras personas."
   }
 }

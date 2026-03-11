@@ -1,22 +1,92 @@
 {
-  "multas_libros": {
+  "multas_libros": { 
     "preguntas": [
       "multa por libro atrasado",
       "¿cuánto es la multa de libro?",
-      "retraso en devolucion"
+      "¿que pasa si me retraso en la entrega de un libro?",
+      "¿puedo entregar un libro tarde?"
     ],
-    "respuesta": "La multa por libro atrasado es de $100 por día de retraso."
+    "respuesta": "Se cobra una cantidad fija por cada dia de atraso."
   },
-  "prestamo_libros": {
+  "renovacion_prestamo_libro": { 
     "preguntas": [
-      "¿como presto un libro?",
-      "préstamo de libros",
-      "quiero llevar un texto",
-      "tomar prestado un volumen",
-      "como me llevo un libro",
-      "procedimiento para préstamo de obras",
-      "necesito un libro de la biblioteca"
+      "quiero renovar un prestamo de libro",
+      "¿se puede renovar un prestamo de libro?",
+      "¿cual es el proceso para renovar un prestamo de libro?",
+      "¿es posible renovar prestamos de libro?"
     ],
-    "respuesta": "Puedes prestar hasta 3 libros por 15 días. Se requiere carné vigente."
+    "respuesta": "No, debes regresarlo antes de la fecha límite, pero puedes solicitarlo para préstamo nuevamente en ese momento."
+  },
+  "encontrar_libro_danado": {
+    "preguntas": [
+      "¿que pasa si encuentro un libro danado?",
+      "encontre un libros danado",
+      "¿donde reportar un libro danado?",
+      "¿necesito ayuda con un libro danado?"
+    ],
+    "respuesta": "Reportarlo al personal de biblioteca."
+  },
+  "requisitos_prestamo_libro": {
+    "preguntas": [
+      "¿que necesito para un prestamo de libros?",
+      "¿cuales son los requisitos para un prestamo de libro?",
+      "¿que se ocupa para un prestamo de libros?",
+      "¿que requiero en caso de querer pedir un libro prestado?"
+    ],
+    "respuesta": "Credencial con holograma, y ser usuario activo."
+  },
+  "duracion_prestamo_libro": {
+    "preguntas": [
+      "¿cuantos dias dura el prestamo de un libro?",
+      "¿cuanto tiempo dura el prestamo libro?",
+      "¿por cuanto tiempo se prestan libros?",
+      "¿cuanto dura un prestamo de libro?"
+    ],
+    "respuesta": "15 dias por lo general, salvo por que se informe lo contrario al momento del prestamo."
+  },
+  "cantidad_prestamo_libros": {
+    "preguntas": [
+      "¿cual es el maximo de libros que se prestan?",
+      "¿cuantos libros me pueden prestar?",
+      "¿cual es el limite de libros que puedo solicitar?",
+      "¿cuantos libros puedo solicitar?"
+    ],
+    "respuesta": "El máximo es de 5 libros prestados al mismo tiempo."
+  },
+  "limite_pago_multas_libro": {
+    "preguntas": [
+      "¿cuanto tiempo tengo para pagar la multa de libro?",
+      "¿que pasa si no pago la multa de libro?",
+      "¿las multas de libro generan intereses?",
+      "¿existe fecha limite para pagar multas por libros?"
+    ],
+    "respuesta": "Las multas no generan intereses y no hay un límite de tiempo para pagar una multa, pero ciertos servicios se verán restringidos."
+  },
+  "solicitar_prestamo": {
+    "preguntas": [
+      "¿donde se solicitan prestamos de libro?",
+      "¿con quien me dirijo para solicitar un prestamo de libro?",
+      "¿quien me puede prestar un libro?",
+      "¿donde comienzo con el proceso de prestamo de libro?"
+    ],
+    "respuesta": "Dirígete al escritorio de préstamos a la derecha de la salida con los libros de tu interés."
+  },
+  "dano_perdida_libro": {
+    "preguntas": [
+      "¿que hago si dane un libro?",
+      "¿que pasa si perdi un libro?",
+      "¿a quien me dirijo si dane un libro?",
+      "¿que hago si perdi un libro?"
+    ],
+    "respuesta": "Debe reportarse al personal de la biblioteca para valorar el caso, puedes ser que debas reponer el libro o cubrir su costo en moneda nacional."
+  },
+  "busqueda_libro": {
+    "preguntas": [
+      "deseo encontrar un libro",
+      "busco un libro",
+      "¿como puedo encontrar libros?",
+      "¿quien me puede ayudara buscar libros?"
+    ],
+    "respuesta": "Puedes consultar el catálogo, o solicitar ayuda al personal."
   }
 }

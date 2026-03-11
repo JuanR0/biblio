@@ -16,7 +16,8 @@ async def process_query(request: ChatRequest):
             question=request.question,
             answer=response["answer"],
             confidence=response["confidence"],
-            source=response["source"]
+            source=response["source"],
+            entities=response["entities"]
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
