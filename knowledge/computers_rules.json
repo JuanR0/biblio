@@ -1,33 +1,103 @@
 {
-  "uso_computadoras": {
+  "usuarios_computadoras": {
     "preguntas": [
-      "¿cómo uso una computadora?",
-      "quiero usar un ordenador",
-      "acceso a equipos",
-      "¿puedo usar las PCs?",
-      "cómo utilizar computadora",
-      "necesito computadora"
+      "¿quienes pueden solicitar una computadora?",
+      "necesito una computadora prestada",
+      "¿que necesito para solicitar una computadora?",
+      "¿puedo solicitar una computadora?",
+      "¿cuales son los requisitos para solciitar una computadora?"
     ],
-    "respuesta": "Las computadoras están disponibles por orden de llegada. Máximo 2 horas por persona. Presenta tu carné en el área de tecnología."
+    "respuesta": "Usuarios activos pueden solicitar una computadora en el escritorio de préstamos presentando su credencial (vigente)."
   },
   "reserva_computadoras": {
     "preguntas": [
-      "¿cómo reservo una computadora?",
-      "reservar ordenador",
-      "apartar equipo",
-      "¿puedo reservar PC?",
-      "reservación de computadoras"
+      "¿como reservo una computadora?",
+      "quiero reservar computadora",
+      "necesito apartar una computadora",
+      "¿puedo reservar un pc?",
+      "¿que necesito para reservar uan computadora?"
     ],
-    "respuesta": "No se aceptan reservas previas. Las computadoras son por orden de llegada. Horario preferencial: antes de las 11 AM."
+    "respuesta": "No es posible reservar computadoras, estas solo se prestan en el momento que se solicitan."
   },
-  "reglas_computadoras": {
+  "instalar_desinstalar_programas_computadoras": {
     "preguntas": [
-      "¿qué reglas hay para computadoras?",
-      "normas uso ordenadores",
-      "reglamento equipos",
-      "prohibiciones computadoras",
-      "¿se puede comer junto a las computadoras?"
+      "¿como puedo instalar progrmas en la computadora?",
+      "¿como puedo desinstalar programas de la computadora?",
+      "necesito ciertos programs en la computadora para trabajar",
+      "quiero instalar un programa en la computadora",
+      "¿cuales son las reglas con respecto a los programas de computadora?"
     ],
-    "respuesta": "No descargar software. No modificar configuraciones. Uso académico únicamente."
+    "respuesta": "A los usuarios no se les permite instalar ni desinstalar programas, si necesitas algún programa en específico comentaselo al personal para evaluar el caso."
+  },
+  "alterar_configuracion_computadoras": {
+    "preguntas": [
+      "¿puedo modificar la configuracion de la computadora?",
+      "¿esta permitido modificar la configuracion de la computadora?",
+      "necesito modificar la configuracion de la computadora",
+      "quiero hacer modificaciones a la configuracion de la computadora",
+      "¿quien tiene permitido cambiar la configuracion de la computadora?"
+    ],
+    "respuesta": "Los usuarios no pueden realizar modificaciones a la configuración de las computadoras, acércate al personal de biblioteca para que te asesoren."
+  },
+  "duracion_prestamo_computadoras": {
+    "preguntas": [
+      "¿por cuanto tiempo se prestan computadoras?",
+      "¿cuanto dura un prestamo de computadora?",
+      "¿puedo yo decidir la duracion de un prestamo de computadora?",
+      "quiero hacer modificaciones a la configuracion de la computadora",
+      "¿quien tiene permitido cambiar la configuracion de la computadora?"
+    ],
+    "respuesta": "El préstamo de computadoras tiene una duración máxima de 2 horas, pasado este lapso el usuario debe regresar el equipo, aunque es posible solicitar el préstamo inmediatamente después si no hay fila de espera."
+  },
+  "multas_computadoras": {
+    "preguntas": [
+      "¿que pasa si regreso tarde una computadora?",
+      "¿el prestamo de computadoras pueden generar multas?",
+      "¿cuanto se cobra por un retraso en el regreso de una computadora?",
+      "¿multan por regresar tarde una computadora?",
+      "¿cual es la multa por regreso tardio de una computadora?",
+      "quiero saber cual es la multa por pedir prestada una computadora"
+    ],
+    "respuesta": "Las computadoras no generan multas monetarias por entrega tardía, pero el usuario queda expuesto a recibir una suspensión temporal del servicio."
+  },
+  "danos_computadoras": {
+    "preguntas": [
+      "¿que hago si la computadora no enciende?",
+      "¿que debo hacer si la computadora esta fallando?",
+      "la computadora que me prestaron esta fallando",
+      "¿que debo hacer si dane la computadora?",
+      "me esta dando muchos problemas la computadora que me prestaron"
+    ],
+    "respuesta": "Reportalo cuanto antes al personal de la biblioteca, de preferencia en el escritorio donde se te entregó para aclarar la situación lo antes posible."
+  },
+  "donde_solicitar_computadoras": {
+    "preguntas": [
+      "¿donde se solicitan computadoras prestadas?",
+      "¿quien me puede prestar una computadora?",
+      "necesito saber donde se encuentran las computadoras",
+      "¿en que lugar se prestan computadoras?",
+      "necesito una computadora"
+    ],
+    "respuesta": "Las computadoras se pueden pedir prestadas en el escritorio de préstamos              ."
+  },
+  "software_computadoras": {
+    "preguntas": [
+      "¿con que programas cuenta la computadora?",
+      "¿que programas estan instalados en la comutadora?",
+      "¿cuales son los programas con los que dispone la computadora?",
+      "¿las computadoras ya tienen programas instalados?",
+      "¿ustedes ya preinstalaron programas en la computadora?"
+    ],
+    "respuesta": "Los programas con los que cuentan las computadoras son: Chrome, Microsoft Office, Codeblocks, VS code, y Matlab."
+  }, 
+  "compartir_computadoras": {
+    "preguntas": [
+      "¿se puede compartir la computadora?",
+      "¿le puedo prestar la computadora a alguien mas?",
+      "¿puede alguien mas usar la computadora que me prestaron?",
+      "¿quien es responable por el equipo?",
+      "¿los prestamos pueden ser compartidos?"
+    ],
+    "respuesta": "El responsable del equipo, y a quien se le sancionará por cualquier problema  que esté presente derivado del préstamo, es el usuario que lo solicitó prestado."
   } 
 }

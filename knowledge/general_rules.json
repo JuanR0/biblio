@@ -1,22 +1,22 @@
 {
-  "horario": {
+  "horario_bilbioteca": {
     "preguntas": [
       "¿cuál es el horario?",
-      "¿a qué hora abren?",
-      "horario de atención",
-      "¿cuándo cierran?"
+      "¿a que hora abren?",
+      "horario de atencion",
+      "¿cuando cierran?",
+      "en que horario opera la bilioteca",
+      "abren los fines de semana?"
     ],
     "respuesta": "La biblioteca atiende de lunes a viernes de 8:00 a 20:00, sábados de 9:00 a 14:00."
   },
   "ubicaciones_banos": {
     "preguntas": [
       "¿donde encuentro el WC?",
-      "¿donde se encuentra el wc?",
-      "¿donde esta el baño?",
-      "¿donde busco el inodoro?",
-      "¿dónde están los servicios?",
-      "espectaculo de cuero y latigo como jamas has visto",
-      "necesito hacer un deposito en banorte"
+      "necesito hacer un deposito en banorte",
+      "¿en que lugar de la biblioteca se encuentra el wc?",
+      "quiero localizar el bano",
+      "debo encontrar el bano o ocurrira una tragedia"
       
     ],
     "respuesta": "Los baños se encuentran en el primer piso, al lado de la sala de lectura."
@@ -26,7 +26,8 @@
       "¿donde se encuentra atencion a usuarios?",
       "¿donde puedo encontrar atencion a usuarios?",
       "¿donde se ubica atencion a usuarios?",
-      "¿donde atienden usuarios?"
+      "¿donde atienden usuarios?",
+      "¿quien atiende aqui?"
     ],
     "respuesta": "Pasando el escritorio de recepción al ingresar, a mano derecha."
   },
@@ -43,7 +44,10 @@
   "ingreso_alimento_y_bebida": {
     "preguntas": [
       "¿Puedo ingresar con alimentos?",
-      "¿Puedo ingresar con bebidas?"
+      "¿Puedo ingresar con bebidas?",
+      "¿puedo entrar a la biblioteca con alimentos en mi mochila?",
+      "¿debo dejar mis alimentos fuera de la biblioteca?",
+      "¿que hago con mis alimentos si quiero entrar a la biblioteca?"
     ],
     "respuesta": "Solo se permite ingresar con alimentos o bebidas en contenedores cerrados."
   },
@@ -51,8 +55,50 @@
     "preguntas": [
       "¿Puedo ingerir alimentos?",
       "¿Puedo consumir bebidas?",
-      "¿Puedo comer en la biblioteca?"
+      "¿Puedo comer en la biblioteca?",
+      "quiero comer en la biblioteca",
+      "¿puedo tomarme mi aguita?"
     ],
     "respuesta": "Solo se permite la ingesta de agua natural con la debida precaución, el cosnumo de otros alimentos y bebidas dentro de la biblitoeca esta prohibido."
+  },
+  "reucrsos_prestamo": {
+    "preguntas": [
+      "¿que tienen disponible para prestamo?",
+      "¿con que materiales cuentan para prestamo?",
+      "¿la biblioteca presta algo?",
+      "necesito un prestamo",
+      "¿que prestan en la biblioteca?"
+    ],
+    "respuesta": "La biblioteca cuenta con los siguientes recursos para préstamo: libros, computadoras, cubículos."
+  },
+  "multas_y_sanciones": {
+    "preguntas": [
+      "¿por que pueden multarte en la biblioteca?",
+      "¿solo prestamos puede provocar sanciones?",
+      "¿pueden sancionarme por mala conducta o mal comportamiento?",
+      "¿las multas solo aplican a los prestamos?",
+      "¿por que pueden multarte en la biblioteca?"
+    ],
+    "respuesta": "Aún sin préstamos de por medio, alteraciones al orden y/o daño a la propiedad de la biblioteca puede resultar en multas y/o sanciones."
+  },
+  "objetos_perdidos": {
+    "preguntas": [
+      "¿donde se entregan objetos perdidos?",
+      "¿donde se reclaman objetos perdidos?",
+      "¿donde puedp recuperar un objeto perdido?",
+      "¿a quien entrego objetos perdidos?",
+      "¿donde se ubica objetos perdidos?"
+    ],
+    "respuesta": "Objetos perdidos se encuentra entrando a la biblioteca a mano izquierda."
+  },
+  "servicio_social": {
+    "preguntas": [
+      "¿me interesa hacer mi servicio social en la biblioteca?",
+      "¿donde se piden informes sobre el servico social?",
+      "¿se puede hacer el servicio social aqui?", 
+      "¿quien puede darme mas informacion sobre el servicio social en la biblioteca?",
+      "¿aqui solciitan prestadores de servicio social?"
+    ],
+    "respuesta": "Puedes dirigirte al módulo de usuarios para dudas, pero las plazas a las que puedes aplicar serán las que se reflejan en la página de servicio social en periodo de registro."
   }
 }

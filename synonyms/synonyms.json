@@ -12,5 +12,8 @@
   "horario": ["tiempo", "jornada"],
   "devolucion": ["retorno"],
   "liquidar": ["pagar"],
-  "usuario" : ["persona", "gente"]
+  "usuario" : ["persona", "gente"],
+  "programas" :["aplicaciones"],
+  "necesito" :["requiero","solicito"],
+  "comer" :["beber"]
 }

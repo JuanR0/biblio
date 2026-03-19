@@ -2,9 +2,10 @@
   "multas_libros": { 
     "preguntas": [
       "multa por libro atrasado",
-      "¿cuánto es la multa de libro?",
-      "¿que pasa si me retraso en la entrega de un libro?",
-      "¿puedo entregar un libro tarde?"
+      "¿cuanto se cobra de multa por devolver libros tarde?",
+      "¿que pasa si me retraso en la devolucion de un libro?",
+      "¿puedo entregar un libro tarde?",
+      "no puede regresar un libro a tiempo"
     ],
     "respuesta": "Se cobra una cantidad fija por cada dia de atraso."
   },
@@ -13,7 +14,8 @@
       "quiero renovar un prestamo de libro",
       "¿se puede renovar un prestamo de libro?",
       "¿cual es el proceso para renovar un prestamo de libro?",
-      "¿es posible renovar prestamos de libro?"
+      "¿es posible renovar prestamos de libro?",
+      "¿que necesito para renovar un prestamo de libro?"
     ],
     "respuesta": "No, debes regresarlo antes de la fecha límite, pero puedes solicitarlo para préstamo nuevamente en ese momento."
   },
@@ -22,16 +24,18 @@
       "¿que pasa si encuentro un libro danado?",
       "encontre un libros danado",
       "¿donde reportar un libro danado?",
-      "¿necesito ayuda con un libro danado?"
+      "necesito ayuda con un libro danado",
+      "¿que dene hacerse con los libros danados?"
     ],
-    "respuesta": "Reportarlo al personal de biblioteca."
+    "respuesta": "Los libros dañados deben ser reportados al personal de biblioteca para su reparación."
   },
   "requisitos_prestamo_libro": {
     "preguntas": [
       "¿que necesito para un prestamo de libros?",
       "¿cuales son los requisitos para un prestamo de libro?",
       "¿que se ocupa para un prestamo de libros?",
-      "¿que requiero en caso de querer pedir un libro prestado?"
+      "¿que requiero en caso de querer pedir un libro prestado?",
+      "¿que debo presentar para que se me preste una computadora?"
     ],
     "respuesta": "Credencial con holograma, y ser usuario activo."
   },
@@ -40,15 +44,17 @@
       "¿cuantos dias dura el prestamo de un libro?",
       "¿cuanto tiempo dura el prestamo libro?",
       "¿por cuanto tiempo se prestan libros?",
-      "¿cuanto dura un prestamo de libro?"
+      "¿cuanto dura un prestamo de libro?",
+      "puedo regreser un libro prestado cuando deje de ocuparlo"
     ],
-    "respuesta": "15 dias por lo general, salvo por que se informe lo contrario al momento del prestamo."
+    "respuesta": "Los prestamos de libro duran 15 dias por lo general, salvo por que se informe lo contrario al momento del prestamo. Puedes regresarlo antes de la fecha límite."
   },
   "cantidad_prestamo_libros": {
     "preguntas": [
       "¿cual es el maximo de libros que se prestan?",
       "¿cuantos libros me pueden prestar?",
       "¿cual es el limite de libros que puedo solicitar?",
+      "¿cuantos libros puedo solicitar?",
       "¿cuantos libros puedo solicitar?"
     ],
     "respuesta": "El máximo es de 5 libros prestados al mismo tiempo."
@@ -58,16 +64,18 @@
       "¿cuanto tiempo tengo para pagar la multa de libro?",
       "¿que pasa si no pago la multa de libro?",
       "¿las multas de libro generan intereses?",
-      "¿existe fecha limite para pagar multas por libros?"
+      "¿existe fecha limite para pagar multas por libros?",
+      "¿que tan necesario es pagar una multa?"
     ],
     "respuesta": "Las multas no generan intereses y no hay un límite de tiempo para pagar una multa, pero ciertos servicios se verán restringidos."
   },
-  "solicitar_prestamo": {
+  "solicitar_prestamo_libro": {
     "preguntas": [
       "¿donde se solicitan prestamos de libro?",
       "¿con quien me dirijo para solicitar un prestamo de libro?",
       "¿quien me puede prestar un libro?",
-      "¿donde comienzo con el proceso de prestamo de libro?"
+      "¿donde comienzo con el proceso de prestamo de libro?",
+      "necesito un libro"
     ],
     "respuesta": "Dirígete al escritorio de préstamos a la derecha de la salida con los libros de tu interés."
   },
@@ -76,7 +84,8 @@
       "¿que hago si dane un libro?",
       "¿que pasa si perdi un libro?",
       "¿a quien me dirijo si dane un libro?",
-      "¿que hago si perdi un libro?"
+      "¿que hago si perdi un libro?",
+      "No encuentro el libro que me prestaron"
     ],
     "respuesta": "Debe reportarse al personal de la biblioteca para valorar el caso, puedes ser que debas reponer el libro o cubrir su costo en moneda nacional."
   },
@@ -85,7 +94,8 @@
       "deseo encontrar un libro",
       "busco un libro",
       "¿como puedo encontrar libros?",
-      "¿quien me puede ayudara buscar libros?"
+      "¿quien me puede ayudara buscar libros?",
+      "no encuentro el libro que busco"
     ],
     "respuesta": "Puedes consultar el catálogo, o solicitar ayuda al personal."
   }
