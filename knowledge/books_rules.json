@@ -5,9 +5,10 @@
       "¿cuanto se cobra de multa por devolver libros tarde?",
       "¿que pasa si me retraso en la devolucion de un libro?",
       "¿puedo entregar un libro tarde?",
-      "no puede regresar un libro a tiempo"
+      "no puede regresar un libro a tiempo",
+      "¿los libros pueden generar multas?"
     ],
-    "respuesta": "Se cobra una cantidad fija por cada dia de atraso."
+    "respuesta": "En prestamo de libro, se cobra una cantidad fija por cada dia de atraso."
   },
   "renovacion_prestamo_libro": { 
     "preguntas": [

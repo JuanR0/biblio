@@ -3,11 +3,12 @@ from typing import Dict, List, Optional
 
 class ChatRequest(BaseModel):
     question: str
-    user_id: Optional[str] = None
+    session_id: Optional[str] = None 
 
 class ChatResponse(BaseModel):
     question: str
     answer: str
     confidence: float
-    source: str  # "general", "books", "computers", "cubicles"
-    entities: Dict[str, List[str]] 
+    source: str
+    entities: Dict[str, List[str]]
+    session_id: Optional[str] = None 
