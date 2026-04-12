@@ -5,7 +5,7 @@
       "quiero reservar una sala de estudio",
       "¿puedo apartar un cubiculo?",
       "quiero apartar un area de estudio",
-      "como conseguir un cubiculo"
+      "¿es posbile reservar un cubiculo?"
     ],
     "respuesta": "Los cubículos no pueden reservarse, aunque puedes hacer fila mientras se desocupa uno."
   },
@@ -53,6 +53,7 @@
   "requisitos_prestamo_cubiculos": {
     "preguntas": [
       "¿que se necesita para solicitar un cubiculo?",
+      "¿que necesito para un prestamo de cubiculo?",
       "quiero solicitar un cubiculo prestado",
       "¿como se pide prestado un cubiculo?",
       "¿que proceso se debe seguir para solicitar un cubiculo?"

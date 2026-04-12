@@ -6,20 +6,22 @@ from datetime import datetime
 
 
 class SessionManager:
-    """Simple session manager using Python dictionaries"""
+    """Manejador de sesiones mediante dictionaries"""
     
-    def __init__(self, session_timeout: int = 1800):
+    def __init__(self, session_timeout: int = 600):
         """
         Args:
-            session_timeout: Session timeout in seconds (default 30 minutes)
+            session_timeout: Session timeout en segundos (default 10 minutes)
         """
         self.sessions: Dict[str, Dict] = {}
         self.session_timeout = session_timeout
     
     def create_session_with_id(self, session_id: str, initial_data: Optional[Dict] = None) -> bool:
-        """Create a session with a specific ID (not UUID)"""
+        """Crear sesion con ID asignado por programa principal"""
         if session_id in self.sessions:
-            return False  
+        # Solo actualizar timestamp
+            self.sessions[session_id]['last_activity'] = time.time()
+            return True
         
         self.sessions[session_id] = {
             'created_at': time.time(),
@@ -33,7 +35,7 @@ class SessionManager:
         return True
 
     def create_session(self, initial_data: Optional[Dict] = None) -> str:
-        """Create a new session and return session ID"""
+        """Creacion de sesion con ID (provisional)"""
         session_id = str(uuid.uuid4())
         self.sessions[session_id] = {
             'created_at': time.time(),
@@ -47,7 +49,7 @@ class SessionManager:
         return session_id
     
     def get_session(self, session_id: str) -> Optional[Dict]:
-        """Get session data if exists and not expired"""
+        """Obtener informacion de sesion activa si existe"""
         if not session_id or session_id not in self.sessions:
             return None
         
@@ -61,7 +63,7 @@ class SessionManager:
         return session
     
     def update_session(self, session_id: str, data: Dict) -> bool:
-        """Update session data"""
+        """Actualizar informacion de sesion"""
         session = self.get_session(session_id)
         if not session:
             return False
@@ -71,7 +73,7 @@ class SessionManager:
         return True
     
     def add_to_history(self, session_id: str, question: str, response: Dict) -> bool:
-        """Add question-answer pair to session history"""
+        """Agregar pregunta-respuesta al historail de la sesion"""
         session = self.get_session(session_id)
         if not session:
             return False
@@ -83,7 +85,7 @@ class SessionManager:
             'timestamp': time.time()
         })
         
-        # limitatrse a 10 categorias para cuidar memoria
+        # limite de categorias para preservar memoria
         if len(session['history']) > 10:
             session['history'] = session['history'][-10:]
         
@@ -94,20 +96,20 @@ class SessionManager:
         return True
     
     def delete_session(self, session_id: str) -> bool:
-        """Delete a specific session"""
+        """Eliminar sesiones especificas"""
         if session_id in self.sessions:
             del self.sessions[session_id]
             return True
         return False
     
     def delete_all_sessions(self) -> int:
-        """Delete all sessions (useful for testing)"""
+        """Eliminar todas las sesiones"""
         count = len(self.sessions)
         self.sessions.clear()
         return count
     
     def get_active_sessions_count(self) -> int:
-        """Get number of active sessions (cleans expired first)"""
+        """Limpieza de sesiones expiradas para obtener cuenta de activas"""
         # limpiar sesiones expiradas
         expired = []
         for sid, session in self.sessions.items():
@@ -120,7 +122,7 @@ class SessionManager:
         return len(self.sessions)
     
     def get_session_summary(self, session_id: str) -> Optional[Dict]:
-        """Get summary of a session (without full history)"""
+        """Info de sesion"""
         session = self.get_session(session_id)
         if not session:
             return None

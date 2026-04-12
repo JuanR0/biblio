@@ -1,0 +1,86 @@
+{
+  "presentacion_biblio": {
+    "preguntas": [
+      "¿que eres tu biblio?",
+      "presentate biblio",
+      "¿cual es tu razon de existir biblio?",
+      "¿para que fuiste creado biblio?",
+      "¿quien eres tu biblio?"
+    ],
+    "respuesta": "¡Hola! Soy Biblio, tu asistente virtual de la biblioteca."
+  },
+  "como_usar_biblio": {
+    "preguntas": [
+      "¿como te uso biblio?",
+      "¿en que me puedes ayudar biblio?",
+      "¿sobre que te puedo preguntar biblio?",
+      "¿que es lo que te puedo preguntar biblio?",
+      "qué te puedo preguntar",
+      "como funciona"
+    ],
+    "respuesta": "Puedes preguntarme sobre nuestros recursos disponibles para prestamos, dudas generales, o sobre mi mismo."
+  },
+  "categorias_biblio": {
+    "preguntas": [
+      "¿como te uso biblio?",
+      "¿como te puedo preguntar?",
+      "¿como puedo hacer preguntas?",
+      "¿que puedo preguntar?",
+      "¿que te puedo preguntar?",
+      "¿que te puedo preguntar?"
+    ],
+    "respuesta": ""
+  },
+  "capacidades_biblio": {
+    "preguntas": [
+      "que puedes hacer",
+      "tus funciones",
+      "funciones",
+      "capacidades",
+      "qué sabes",
+      "que sabes",
+      "qué haces",
+      "que haces",
+      "para qué sirves",
+      "para que sirves"
+    ],
+    "respuesta": "Mis capacidades incluyen:\n\n✅ Responder preguntas sobre servicios de biblioteca\n✅ Recordar el contexto de nuestra conversación\n✅ Entender variaciones de palabras (como 'prestar', 'préstamo', 'prestado')\n✅ Ayudarte con libros, computadoras y cubículos\n✅ Darte información sobre horarios, ubicaciones y reglas\n\n¡Pregúntame lo que necesites!"
+  },
+  "saludo_biblio": {
+    "preguntas": [
+      "hola",
+      "buenos días",
+      "buenas tardes",
+      "buenas noches",
+      "saludos",
+      "hey",
+      "buenas",
+      "holi"
+    ],
+    "respuesta": "¡Hola! Soy Biblio, tu asistente de biblioteca. ¿En qué puedo ayudarte hoy? Puedes preguntarme sobre libros, computadoras, cubículos o servicios generales."
+  },
+  "despedida_biblio": {
+    "preguntas": [
+      "adiós",
+      "adios",
+      "chao",
+      "hasta luego",
+      "nos vemos",
+      "gracias",
+      "bye",
+      "terminar",
+      "salir"
+    ],
+    "respuesta": "¡Fue un placer ayudarte! Si tienes más preguntas, aquí estaré. ¡Hasta pronto! 👋"
+  },
+  "agradecimiento_biblio": {
+    "preguntas": [
+      "gracias",
+      "muchas gracias",
+      "gracias por la ayuda",
+      "te agradezco",
+      "agradecido"
+    ],
+    "respuesta": "¡De nada! Para eso estoy aquí. Si necesitas algo más, no dudes en preguntar. 😊"
+  }
+}

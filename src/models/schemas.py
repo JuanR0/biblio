@@ -1,9 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Dict, List, Optional
 
 class ChatRequest(BaseModel):
-    question: str
-    session_id: Optional[str] = None 
+    question: str = Field(..., min_length=1, description="Pregunta de usuario")
+    session_id: str = Field(..., description="Identificador de sesion")
 
 class ChatResponse(BaseModel):
     question: str
@@ -11,4 +11,4 @@ class ChatResponse(BaseModel):
     confidence: float
     source: str
     entities: Dict[str, List[str]]
-    session_id: Optional[str] = None 
+    session_id: str  

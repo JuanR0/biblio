@@ -46,7 +46,8 @@ class KnowledgeBase:
             "general": "general_rules.json",
             "books": "books_rules.json",
             "computers": "computers_rules.json",
-            "cubicles": "cubicles_rules.json"
+            "cubicles": "cubicles_rules.json",
+            "biblio": "biblio_rules.json"
         }
         
         for category, filename in file_mapping.items():
@@ -80,6 +81,13 @@ class KnowledgeBase:
                 "reserva_cubiculos": {
                     "preguntas": ["cómo reservar cubículo", "sala de estudio"],
                     "respuesta": "Reserva cubículos en recepción. Máximo 3 horas por día."
+                }
+            }
+        elif category == "biblio":
+            return {
+                "presentacion_biblio": {
+                    "preguntas": ["quién eres", "qué haces", "presentación"],
+                    "respuesta": "Soy Biblio, tu asistente virtual de la biblioteca. Puedo ayudarte con preguntas sobre libros, computadoras, cubículos y servicios generales."
                 }
             }
         return {}

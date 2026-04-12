@@ -2,6 +2,7 @@ import json
 import os
 from typing import Dict, List, Tuple, Optional
 from .session_manager import SessionManager
+from .rate_limiter import RateLimiter, TieredRateLimiter
 
 # Intentar importar Spacy, pero tener fallback
 try:
@@ -24,6 +25,13 @@ class ChatBot:
         
         #Initialize session manager
         self.session_manager = SessionManager(session_timeout=1800)
+
+        self.rate_limiter = RateLimiter(
+                    max_requests=2,      # 2 solicitudes
+                    window_seconds=10     # cada 10 segundos
+                )
+
+        self.rate_limit_violations = 0
 
         # Inicializar Spacy si está disponible
         if self.use_spacy:
@@ -61,10 +69,20 @@ class ChatBot:
                            "teléfono", "email", "normas", "reglamento", "acceso"],
                 "peso": 0.7,
                 "exclusivas": ["baño", "wc", "horario", "abrir", "cerrar"]
+            },
+            "biblio": {
+                "palabras": [
+                    "biblio", "asistente", "ayuda", "información", "qué haces", 
+                    "quién eres", "presentación", "bienvenida", "funciones", 
+                    "servicios", "comandos", "preguntar", "como usar", "instrucciones",
+                    "acerca de", "sobre ti", "capacidades", "qué puedes hacer"
+                ],
+                "peso": 0.9,
+                "exclusivas": ["biblio", "asistente", "qué haces", "quién eres"]
             }
         }
         
-        self.debug_mode = True
+        self.debug_mode = False
     
     def _init_spacy(self):
         """Inicializa Spacy si está disponible"""
@@ -105,6 +123,27 @@ class ChatBot:
             print(f" Componentes deshabilitados: {components_to_disable}")
             print(f" Pipeline activo: {self.nlp.pipe_names}")
     
+    def check_rate_limit(self, identifier: str) -> tuple:
+        """
+        Asegurarse de que el ID puede hacer preguntas.
+        
+        Args:
+            identifier: User ID/session ID
+            
+        Returns:
+            (allowed, wait_time, remaining)
+            - allowed: Se permite
+            - wait_time: Segundos de enfriamiento si no
+            - remaining: solicitudes restantes
+        """
+        allowed, result = self.rate_limiter.is_allowed(identifier)
+        
+        if allowed:
+            return True, None, result  # result = solicitudes restantes
+        else:
+            self.rate_limit_violations += 1
+            return False, result, 0    # result = segundos de espera
+
     def extract_lemmas_spacy(self, text: str) -> List[str]:
         """Extrae lemas usando Spacy"""
         if not self.use_spacy or not hasattr(self, 'nlp'):
@@ -154,7 +193,7 @@ class ChatBot:
                         print(f" Categoría forzada a '{category}' por palabra exclusiva: '{palabra}' → '{palabra_normalizada}'")
                     return category, 1.0
         
-        # Usar Spacy para lematización (si está disponible) 
+        # Spacy para lematización (si está disponible) 
         spacy_score = 0.0
         spacy_category = None
         
@@ -262,28 +301,28 @@ class ChatBot:
             
             # Palabras que indican seguimiento de conversación
             followup_indicators = [
-                "y", "también", "además", "entonces", "eso", "esa", "ese", 
-                "y cómo", "y cuándo", "y dónde", "y qué", "y cuánto",
-                "entonces cómo", "entonces cuándo", "entonces dónde",
-                "cual", "cuál", "cuales", "cuáles", "que", "qué",
-                "cuanto", "cuánto", "cuantos", "cuántos",
-                "como", "cómo", "donde", "dónde", "cuando", "cuándo"
+                "y", "tambien", "ademas", "entonces", "eso", "esa", "ese",
+                "y como", "y cuando", "y donde", "y que", "y cuanto",
+                "entonces como", "entonces cuando", "entonces donde",
+                "cual", "que", "cuanto", "como", "donde", "cuando"
             ]
             
             # Detectar si es pregunta de seguimiento
             is_followup = False
             question_lower = question_normalized.lower()
-            
+
+            is_short = len(question_normalized.split()) <= 6
+
             for indicator in followup_indicators:
                 if question_lower.startswith(indicator) or f" {indicator} " in question_lower:
                     is_followup = True
                     break
             
-            # También considerar preguntas muy cortas (probablemente seguimiento)
-            if len(question_normalized.split()) <= 4:
+            # preguntas muy cortas (probablemente seguimiento)
+            if len(question_normalized.split()) <= 5:
                 is_followup = True
             
-            if is_followup:
+            if is_followup or is_short:
                 if self.debug_mode:
                     print(f"📌 Detectada pregunta de seguimiento (score bajo: {normalized_score:.2f})")
                     print(f"   Usando contexto de sesión: '{context_category}'")
@@ -440,8 +479,8 @@ class ChatBot:
             print(f"✅ Chatbot inicializado en modo {mode}")
             
             # Mostrar estadísticas
-            print("\n📊 ESTADISTICAS:")
-            for category in ["general", "books", "computers", "cubicles"]:
+            print("\n ESTADISTICAS:")
+            for category in ["general", "books", "computers", "cubicles", "biblio"]:
                 knowledge = self.knowledge_base.get_knowledge(category)
                 if knowledge:
                     print(f"   {category}: {len(knowledge)} reglas")
@@ -451,7 +490,7 @@ class ChatBot:
         except Exception as e:
             print(f"❌ Error cargando recursos: {e}")
 
-            for category in ["general", "books", "computers", "cubicles"]:
+            for category in ["general", "books", "computers", "cubicles", "biblio"]:
                 if not self.knowledge_base.get_knowledge(category):
                     self.knowledge_base.knowledge[category] = {}
     
@@ -471,7 +510,7 @@ class ChatBot:
             else:
                 confidence = self.matcher.calculate_similarity(expanded_queries, data["preguntas"])
             
-            # # Boost para categorías específicas, TEST
+            # # Boost para categorías específicas (debug)
             # if category != "general":
             #     confidence *= 1.2
             
@@ -482,33 +521,73 @@ class ChatBot:
         return best_answer, best_confidence
     
     def process_question(self, question: str, session_id: str = None) -> Dict:
-        """Procesa pregunta usando texto normalizado"""
+        """
+        Procesa pregunta usando texto normalizado con rate limiting
         
-         # Validate input
+        Args:
+            question: Pregunta de usuario
+            session_id: Asignada por programa principal
+
+        Returns:
+            Dict con respuesta y metadatos
+    
+        Raises:
+            ValueError: Si session_id no es proporcionado
+        """
+        
+        if not session_id:
+            # Por si acaso, el programa principal siempre deberia proveer una sesion
+            if self.debug_mode:
+                print(f"❌ ERROR: No se cuenta con un identificador para la sesion")
+            
+            return {
+                "answer": "Error interno: Identificador de sesión no proporcionado. Contacte al administrador.",
+                "confidence": 0.0,
+                "source": "general",
+                "mode": "basic" if not self.use_spacy else "spacy",
+                "session_id": None,
+                "rate_limited": False,
+                "error": "missing_session_id"
+            }
+        
+        # Si no hay identificador (debug)
+        identifier = session_id if session_id else "anonimo"
+
+        allowed, wait_time, remaining = self.check_rate_limit(session_id)
+
+        if not allowed:
+            if self.debug_mode:
+                print(f"⚠️ Se ha excedido el limite para este ID: {identifier}")
+            
+            return {
+                "answer": f"Has realizado demasiadas preguntas. Por favor espera {wait_time} segundos antes de continuar.",
+                "confidence": 0.0,
+                "source": "general",
+                "mode": "basic" if not self.use_spacy else "spacy",
+                "session_id": session_id,
+                "rate_limited": True,
+                "wait_time": wait_time
+            }
+        
+        # Validar entrada
         if not question or not question.strip():
             return {
                 "answer": "Haz una pregunta sobre los servicios de la biblioteca.",
                 "confidence": 0.0,
                 "source": "general",
                 "mode": "basic" if not self.use_spacy else "spacy",
-                "session_id": session_id
+                "session_id": session_id,
+                "rate_limited": False
             }
         
-         # Get or create session
-        session = None
-        if session_id:
-            session = self.session_manager.get_session(session_id)
+        session = self.session_manager.get_session(session_id)
 
         if not session:
-            # Create new session
-            # If session_id was provided but doesn't exist, use it
-            if session_id:
-                # Use the provided session_id (no UUID)
-                self.session_manager.create_session_with_id(session_id)
-            else:
-                # No session_id provided, create UUID
-                session_id = self.session_manager.create_session()
-    
+            # Redundancia, la sesion se asigna por parte del programa principal
+            if self.debug_mode:
+                print(f"🆕 Creating new session for: {session_id}")
+            
+            self.session_manager.create_session_with_id(session_id)
             session = self.session_manager.get_session(session_id)
 
         # Si esta disponible, contexto se toma en cuenta para mejor categorizacion
@@ -522,16 +601,16 @@ class ChatBot:
         if self.debug_mode:
             print(f"\n{'='*60}")
             print(f" PROCESANDO: '{question}'")
-            print(f" Sesión: {session_id[:8]}...")
+            print(f" Sesión: {session_id[:8]}..." if len(session_id) > 8 else f" Sesión: {session_id}")
             print(f" Normalizado: '{question_for_processing}'")
             if session.get('last_category'):
                 print(f" Contexto: última categoría = '{session['last_category']}'")
             print(f"{'='*60}")
 
-        # ========== PASS CONTEXT TO CATEGORIZE ==========
+        # Paso de contexto para categoria
         category, category_confidence = self.categorize_question(
             question_for_processing,
-            context_category=session.get('last_category')  # ← Pass last category
+            context_category=session.get('last_category')
         )
         
         if self.debug_mode:
@@ -558,6 +637,7 @@ class ChatBot:
             "books": 0.4,
             "computers": 0.4,
             "cubicles": 0.4,
+            "biblio": 0.35,
             "general": 0.3
         }
         
@@ -566,7 +646,7 @@ class ChatBot:
         # Si no supera umbral, buscar en general
         if best_confidence < threshold:
             if self.debug_mode:
-                print(f"⚠️  Confianza baja ({best_confidence:.3f} < {threshold}), probando 'general'...")
+                print(f"⚠️  Confianza baja ({best_confidence:.3f} < {threshold}), probando 'general'")
             
             general_answer, general_confidence = self.search_in_category("general", expanded_queries)
             
@@ -596,18 +676,20 @@ class ChatBot:
             "source": best_source,
             "mode": "basic" if not self.use_spacy else "spacy",
             "entities": entities,
-            "session_id": session_id,  # NEW: Return session_id
+            "session_id": session_id,
+            "rate_limited": False,                    
+            "rate_limit_remaining": remaining,        
             "details": {
                 "category_confidence": round(category_confidence, 3),
                 "expanded_queries_count": len(expanded_queries),
-                "conversation_count": session.get('conversation_count', 0)  # NEW
+                "conversation_count": session.get('conversation_count', 0)
             }
         }
         
-        # NEW: Save to session history
+        # Guardar en el historial de sesion
         self.session_manager.add_to_history(session_id, question, result)
         
-        # NEW: Update session with latest context
+        # Actualizar sesion con el contexto reciente
         self.session_manager.update_session(session_id, {
             'last_category': best_source,
             'last_entities': entities,
@@ -620,10 +702,10 @@ class ChatBot:
             print(f"   Respuesta: {best_answer[:80]}...")
             print(f"   Confianza: {final_confidence:.3f}")
             print(f"   Conversación #{session.get('conversation_count', 0)}")
+            print(f"   Rate limit restante: {remaining}/{self.rate_limiter.max_requests}")
             print(f"{'='*60}\n")
         
         return result
-    
     
     def get_fallback_response(self, category: str, question: str = "") -> str:
         """Respuesta de fallback especifica por categoría"""
@@ -639,12 +721,16 @@ class ChatBot:
         if "computadora" in question_lower or "ordenador" in question_lower:
             return "Las computadoras están disponibles por orden de llegada. Máximo 2 horas de uso. Presenta tu carné."
         
+        if any(word in question_lower for word in ["biblio", "asistente", "quién eres", "quien eres", "qué haces", "que haces"]):
+            return "¡Hola! Soy Biblio, tu asistente virtual. Puedo ayudarte con preguntas sobre libros, computadoras, cubículos y servicios de la biblioteca. ¿Qué necesitas saber?"
+
         # Respuestas genericas por categoria
         fallback_responses = {
             "books": "Información sobre libros disponible en recepción. Horario de atención: 8 AM a 6 PM.",
             "computers": "Consulta las reglas de uso de computadoras en el área de tecnología.",
             "cubicles": "Para reservar cubículos, visita la recepción con identificación.",
-            "general": "No he entendido la pregunta, ¿podrías reformularla?."
+            "general": "No he entendido la pregunta, ¿podrías reformularla?.",
+            "biblio": "Soy Biblio, tu asistente. Pregúntame sobre libros, computadoras, cubículos o servicios generales."
         }
         
         return fallback_responses.get(category, fallback_responses["general"])
@@ -689,16 +775,14 @@ def create_chatbot(force_basic: bool = False) -> ChatBot:
     
     return ChatBot(use_spacy=use_spacy)
 
-# Funcin de diagnostico
 def diagnose_spacy():
-    """Diagnóstico de Spacy"""
+    """Diagnóstico de Spacy (problema de dependencia?)"""
     print("\n" + "="*60)
     print(" DIAGNÓSTICO DE SPACY")
     print("="*60)
     
     if not SPACY_AVAILABLE:
         print("❌ Spacy no está instalado")
-        #print("💡 Solución: pip install spacy")
         return False
     
     print("✅ Spacy está instalado")
@@ -720,7 +804,7 @@ def diagnose_spacy():
         
     except Exception as e:
         print(f"❌ Error cargando modelo: {e}")
-        print("💡 Solución: python -m spacy download es_core_news_sm")
+        # Solución: python -m spacy download es_core_news_sm"
         return False
 
 if __name__ == "__main__":
@@ -729,7 +813,7 @@ if __name__ == "__main__":
     
     # Crear y probar chatbot
     print(f"\n{'='*60}")
-    print("🤖 PRUEBA DEL CHATBOT")
+    print("PRUEBA DEL CHATBOT")
     print("="*60)
     
     chatbot = create_chatbot()
@@ -745,4 +829,4 @@ if __name__ == "__main__":
         print(f"\n[{i}] Q: {question}")
         response = chatbot.process_question(question)
         print(f"    A: {response['answer'][:80]}...")
-        print(f"    📍 {response['source']} | 🤖 {response['mode']} | 📊 {response['confidence']}")
+        print(f"    📍 {response['source']} | {response['mode']} | {response['confidence']}")
