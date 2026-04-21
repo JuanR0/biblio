@@ -11,3 +11,6 @@ pydantic
 bcrypt==4.0.1
 python-jose[cryptography]
 passlib[bcrypt]
+
+#pip install spacy
+#python -m spacy download es_core_news_sm

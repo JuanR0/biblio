@@ -19,6 +19,10 @@ from .matcher import QueryMatcher
 class ChatBot:
     def __init__(self, knowledge_path: str = "knowledge/", synonyms_path: str = "synonyms/", use_spacy: bool = True):
        
+        fallback_threshold: float = 0.25,
+        log_low_confidence: bool = True,
+        low_confidence_log_path: str = "logs/low_confidence_queries.log"
+
         self.knowledge_base = KnowledgeBase(knowledge_path)
         self.matcher = QueryMatcher(synonyms_path)
         self.use_spacy = use_spacy and SPACY_AVAILABLE
@@ -39,6 +43,14 @@ class ChatBot:
         
         self.load_resources()
         
+        self.fallback_threshold = fallback_threshold
+        self.log_low_confidence = log_low_confidence
+        self.low_confidence_log_path = low_confidence_log_path
+        
+        # Crear directorio de logs si está habilitado
+        if self.log_low_confidence:
+            os.makedirs(os.path.dirname(low_confidence_log_path), exist_ok=True)
+
         # Configuracion de categorias
         self.category_keywords = {
             "books": {
@@ -659,12 +671,17 @@ class ChatBot:
                     print(f"🔄 Cambiando a 'general': {general_confidence:.3f}")
         
         # Usar respuesta de fallback 
-        if best_confidence < 0.25:
-            best_answer = self.get_fallback_response(best_source, question)
-            best_confidence = 0.25
-            
+        if best_confidence < self.fallback_threshold:
             if self.debug_mode:
-                print(f" Usando respuesta de fallback")
+                print(f"⚠️  Confianza ({best_confidence:.3f}) por debajo del umbral ({self.fallback_threshold})")
+                print("   Activando respuesta 'No sé'")
+            
+            if self.log_low_confidence:
+                self._log_low_confidence(question, session_id, best_confidence, best_source)
+            
+            best_answer = self.get_idk_response()
+            best_confidence = 0.0
+            best_source = "fallback"
         
         entities = self.extract_entities(question)
 
@@ -734,6 +751,33 @@ class ChatBot:
         }
         
         return fallback_responses.get(category, fallback_responses["general"])
+    
+    def get_idk_response(self) -> str:
+        """Basicamente "No se" como repsuesta"""
+        return (
+            "Lo siento, no tengo información suficiente para responder a esa pregunta. "
+            "¿Podrías reformularla o consultar directamente en el mostrador de atención al usuario? "
+            "¡Estaré encantado de ayudarte con otras dudas sobre la biblioteca!"
+        )
+
+    def _log_low_confidence(self, question: str, session_id: str, confidence: float, attempted_source: str):
+        """Log a low-confidence query para retroalimentacion."""
+        import json
+        from datetime import datetime
+        
+        log_entry = {
+            "timestamp": datetime.now().isoformat(),
+            "session_id": session_id,
+            "question": question,
+            "confidence": round(confidence, 4),
+            "attempted_source": attempted_source
+        }
+        
+        try:
+            with open(self.low_confidence_log_path, 'a', encoding='utf-8') as f:
+                f.write(json.dumps(log_entry, ensure_ascii=False) + '\n')
+        except Exception as e:
+            print(f"⚠️  Error writing low-confidence log: {e}")
     
     def get_system_info(self) -> Dict:
         """Obtiene información del sistema"""
