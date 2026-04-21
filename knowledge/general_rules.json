@@ -1,5 +1,5 @@
 {
-  "horario_biblioteca": {
+  "horario_bilbioteca": {
     "preguntas": [
       "¿cuál es el horario?",
       "¿a que hora abren?",
@@ -12,8 +12,7 @@
   },
   "ubicaciones_banos": {
     "preguntas": [
-      "¿donde se puede localizar el bano?",
-      "¿donde encuentro el bano?",
+      "¿donde encuentro el WC?",
       "necesito hacer un deposito en banorte",
       "¿en que lugar de la biblioteca se encuentra el wc?",
       "quiero localizar el bano",
@@ -60,9 +59,9 @@
       "quiero comer en la biblioteca",
       "¿puedo tomarme mi aguita?"
     ],
-    "respuesta": "Solo se permite la ingesta de agua natural con la debida precaución, el cosnumo de otros alimentos y bebidas dentro de la biblitoeca esta prohibido."
+    "respuesta": "Solo se permite la ingesta de agua natural con la debida precaución, el consumo de otros alimentos y bebidas dentro de la biblitoeca esta prohibido."
   },
-  "reucrsos_prestamo": {
+  "recursos_prestamo": {
     "preguntas": [
       "¿que tienen disponible para prestamo?",
       "¿con que materiales cuentan para prestamo?",

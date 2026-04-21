@@ -5,10 +5,9 @@
       "¿cuanto se cobra de multa por devolver libros tarde?",
       "¿que pasa si me retraso en la devolucion de un libro?",
       "¿puedo entregar un libro tarde?",
-      "no puede regresar un libro a tiempo",
-      "¿los libros pueden generar multas?"
+      "no puede regresar un libro a tiempo"
     ],
-    "respuesta": "En prestamo de libro, se cobra una cantidad fija por cada dia de atraso."
+    "respuesta": "Se cobra una cantidad fija por cada dia de atraso."
   },
   "renovacion_prestamo_libro": { 
     "preguntas": [
@@ -46,7 +45,7 @@
       "¿cuanto tiempo dura el prestamo libro?",
       "¿por cuanto tiempo se prestan libros?",
       "¿cuanto dura un prestamo de libro?",
-      "puedo regreser un libro prestado cuando deje de ocuparlo"
+      "¿puedo regresar un libro prestado cuando deje de ocuparlo?"
     ],
     "respuesta": "Los prestamos de libro duran 15 dias por lo general, salvo por que se informe lo contrario al momento del prestamo. Puedes regresarlo antes de la fecha límite."
   },
