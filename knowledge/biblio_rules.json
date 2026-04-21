@@ -2,74 +2,65 @@
   "presentacion_biblio": {
     "preguntas": [
       "¿que eres tu biblio?",
+      "¿cual es tu proposito?",
       "presentate biblio",
       "¿cual es tu razon de existir biblio?",
       "¿para que fuiste creado biblio?",
       "¿quien eres tu biblio?"
     ],
-    "respuesta": "¡Hola! Soy Biblio, tu asistente virtual de la biblioteca."
+    "respuesta": "¡Hola! Soy Biblio, tu asistente de biblioteca. ¿En qué puedo ayudarte hoy? Puedes preguntarme sobre libros, computadoras, cubículos o servicios generales."
   },
-  "como_usar_biblio": {
+  "temas_biblio": {
     "preguntas": [
-      "¿como te uso biblio?",
+      "¿sobre que temas me pues contestar?",
       "¿en que me puedes ayudar biblio?",
       "¿sobre que te puedo preguntar biblio?",
       "¿que es lo que te puedo preguntar biblio?",
-      "qué te puedo preguntar",
-      "como funciona"
+      "¿cuales son tus areas de conocimiento biblio?"
     ],
     "respuesta": "Puedes preguntarme sobre nuestros recursos disponibles para prestamos, dudas generales, o sobre mi mismo."
   },
-  "categorias_biblio": {
+  "como_preguntar": {
     "preguntas": [
       "¿como te uso biblio?",
-      "¿como te puedo preguntar?",
+      "¿como te puedo preguntar biblio?",
       "¿como puedo hacer preguntas?",
-      "¿que puedo preguntar?",
-      "¿que te puedo preguntar?",
-      "¿que te puedo preguntar?"
+      "¿como puedo formularte preguntas biblio?",
+      "¿de que forma debo estructurar la pregunta?"
     ],
-    "respuesta": ""
+    "respuesta": "Puedes formular una pregunta como lo harías normalmente, solo especifica mi nombre si la duda es sobre mi, o sobre alguno de nuestros recursos (computadoras, cubículos y/o computadoras)."
   },
-  "capacidades_biblio": {
+  "problema_preguntando": {
     "preguntas": [
-      "que puedes hacer",
-      "tus funciones",
-      "funciones",
-      "capacidades",
-      "qué sabes",
-      "que sabes",
-      "qué haces",
-      "que haces",
-      "para qué sirves",
-      "para que sirves"
+      "biblio mi pregunta no pasa",
+      "¿biblio por que mi pregunta no pasa?",
+      "biblio estoy recibiendo una respuesta incorrecta a mi pregunta",
+      "¿biblio por que mi pregunta no esta siendo contestada correctamente?",
+      "¿biblio por que estoy teniendo problemas con mis preguntas?",
+      "biblio la respuesta que recibi es incorrecta"
     ],
-    "respuesta": "Mis capacidades incluyen:\n\n✅ Responder preguntas sobre servicios de biblioteca\n✅ Recordar el contexto de nuestra conversación\n✅ Entender variaciones de palabras (como 'prestar', 'préstamo', 'prestado')\n✅ Ayudarte con libros, computadoras y cubículos\n✅ Darte información sobre horarios, ubicaciones y reglas\n\n¡Pregúntame lo que necesites!"
+    "respuesta": "Debes especificar la categoria de interes o se buscara una respuesta en las reglas generales. Puedes tambien tratar de modificar tu respuesta, o consultar nuestra sugerencia de preguntas."
   },
   "saludo_biblio": {
     "preguntas": [
-      "hola",
-      "buenos días",
-      "buenas tardes",
-      "buenas noches",
-      "saludos",
-      "hey",
-      "buenas",
-      "holi"
+      "hola biblio",
+      "buenos días biblio",
+      "buenas tardes biblio",
+      "buenas noches biblio",
+      "saludos biblio",
+      "hey biblio",
+      "buenas biblio"
     ],
     "respuesta": "¡Hola! Soy Biblio, tu asistente de biblioteca. ¿En qué puedo ayudarte hoy? Puedes preguntarme sobre libros, computadoras, cubículos o servicios generales."
   },
   "despedida_biblio": {
     "preguntas": [
-      "adiós",
-      "adios",
-      "chao",
-      "hasta luego",
-      "nos vemos",
-      "gracias",
-      "bye",
-      "terminar",
-      "salir"
+      "adios biblio",
+      "nos vemos biblio",
+      "hasta luego biblio",
+      "bytes biblio",
+      "gracias biblio",
+      "bye biblio"
     ],
     "respuesta": "¡Fue un placer ayudarte! Si tienes más preguntas, aquí estaré. ¡Hasta pronto! 👋"
   },
@@ -82,5 +73,37 @@
       "agradecido"
     ],
     "respuesta": "¡De nada! Para eso estoy aquí. Si necesitas algo más, no dudes en preguntar. 😊"
+  },
+  "dudas_fallas": {
+    "preguntas": [
+      "¿a quien puedo recurrir para reportar problemas contigo biblio?",
+      "¿como puedo reportar problemas contigo biblio?",
+      "¿como puedo hacer sugerencias sobre ti biblio?",
+      "¿donde puedo comunicar mis sugerencias sobre ti biblio?",
+      "¿donde encuentro el buzon de sugerencias para ti biblio?"
+    ],
+    "respuesta": "Puedes comentarselas al personal de la biblioteca, o reportarlo directo en la aplicacion en el boton de ayuda."
+  },
+  "limite_preguntas": {
+    "preguntas": [
+      "¿hay un lmite de preguntas que puedo hacerte biblio?",
+      "¿cual es el maximo de preguntas que puedo hacerte biblio?",
+      "¿puedo hacer cuantas preguntas quiera biblio?",
+      "¿es limitada la cantidad de preguntas que puedo hacer iblio?",
+      "¿que pasa si llego al limite de preguntas biblio?",
+      "he llegado al limite de preguntas que puedo hacer biblio"
+    ],
+    "respuesta": "Puedes realizar un máximo de 2 preguntas cada 10 segundos. Si has llegado al limite solo debes esperar un par de segundos, solo se desbloqueara."
+  },
+  "preguntas_seguimiento": {
+    "preguntas": [
+      "¿como puedo hacer preguntras de seguimiento biblio?",
+      "¿puefo realizar preguntas seguidas sobre la misma categoria?",
+      "quiero hacer una pregunta de seguimiento",
+      "¿las preguntas de seguimiento se preguntan de forma especifica?",
+      "¿como dejo de hacer preguntas de seguimiento?",
+      "ya no quiero hacer preguntas de seguimiento"
+    ],
+    "respuesta": "Las preguntas de seguimiento tienen criterios como ser menos de 5 palabras, o comenzar con 'y'. Puedes cambiar la categoría especificando una nueva, o bien haciendo una pregunta general."
   }
 }

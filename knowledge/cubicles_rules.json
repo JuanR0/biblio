@@ -17,7 +17,7 @@
       "¿limite de personas por cubiculo?",
       "¿cuántas personas caben en un cubiculo?"
     ],
-    "respuesta": "Se necesita un mínimo de usuarios para solicitar un cubículo es de 4, y el máximo es de 6."
+    "respuesta": "Se necesita un mínimo de 4 usuarios para solicitar un cubículo, con 6 siendo el máximo."
   },
   "entregar_cubiculos": {
     "preguntas": [
@@ -88,7 +88,7 @@
       "¿por cuanto tiempo me prestaran un cubiculo?",
       "¿Cual es el limite de tiempo para prestamo de cubiculo?"
     ],
-    "respuesta": "El límite de tiempo para préstamo de cubículo es de horas, se puede solicitar inmediatamente después de que termina el préstamo si no hay fila."
+    "respuesta": "El límite de tiempo para préstamo de cubículo es de 2 horas, se puede solicitar inmediatamente después de que termina el préstamo si no hay fila."
   },
   "invitar_terceros_cubiculos": {
     "preguntas": [
