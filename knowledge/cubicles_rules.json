@@ -5,7 +5,7 @@
       "quiero reservar una sala de estudio",
       "¿puedo apartar un cubiculo?",
       "quiero apartar un area de estudio",
-      "como conseguir un cubiculo"
+      "¿es posbile reservar un cubiculo?"
     ],
     "respuesta": "Los cubículos no pueden reservarse, aunque puedes hacer fila mientras se desocupa uno."
   },
@@ -34,14 +34,15 @@
       "¿se puede comer dentro de los cubiculos?",
       "¿Se puede beber en los cubiculos?",
       "¿las reglasd de sobre consumo de alimentos de la biblioteca tambien afecta a cubiculos?",
-      "quiero solicitar un cubiculo para comer"
+      "quiero solicitar un cubiculo para comer",
+      "¿se pueden ingerir alimento o bebidas en los cubiculos?"
     ],
     "respuesta": "Así como en el resto del área de biblioteca, solo se pueden ingresar alimentos en empaques cerrados, y solo se puede consumir agua natural con el debido cuidado."
   },
   "multas_cubiculos": {
     "preguntas": [
       "¿hay multa por exceder el tiempo en el cubiculo?",
-      "multa por cubiculo",
+      "¿aqui se multa por prestamo de cubiculo?",
       "¿qué pasa si me paso del tiempo en la sala?",
       "¿cuánto es la multa por cubiculo?",
       "¿hay cargo extra si no salgo a tiempo?",
@@ -52,6 +53,7 @@
   "requisitos_prestamo_cubiculos": {
     "preguntas": [
       "¿que se necesita para solicitar un cubiculo?",
+      "¿que necesito para un prestamo de cubiculo?",
       "quiero solicitar un cubiculo prestado",
       "¿como se pide prestado un cubiculo?",
       "¿que proceso se debe seguir para solicitar un cubiculo?"
@@ -77,7 +79,7 @@
       "¿que pasa si el mobiliario del cubiculo esta en mal estado?"
     ],
     "respuesta": "Debes reportarlo de inmediato al personal de la biblioteca para iniciar una investigación y deslindarse de toda responsabilidad por tal situación."
-  },
+  },  
   "limite_tiempo_cubiculos": {
     "preguntas": [
       "necesito un cubiculo por tiempo indefinido",
@@ -90,7 +92,7 @@
   },
   "invitar_terceros_cubiculos": {
     "preguntas": [
-      "puedo invitar a otros companeros al cubiculo?",
+      "¿puedo invitar a otros companeros al cubiculo?",
       "necesito que ingresen otros companeros al cubiculo",
       "¿quienes pueden estar presentes en el cubiculo?",
       "¿a quienes se les permite ingresar al cubiculo?",

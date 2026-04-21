@@ -1,5 +1,5 @@
 {
-  "horario_bilbioteca": {
+  "horario_biblioteca": {
     "preguntas": [
       "¿cuál es el horario?",
       "¿a que hora abren?",
@@ -12,7 +12,8 @@
   },
   "ubicaciones_banos": {
     "preguntas": [
-      "¿donde encuentro el WC?",
+      "¿donde se puede localizar el bano?",
+      "¿donde encuentro el bano?",
       "necesito hacer un deposito en banorte",
       "¿en que lugar de la biblioteca se encuentra el wc?",
       "quiero localizar el bano",
