@@ -1,6 +1,8 @@
 import json
 import os
 from typing import Dict, List, Tuple, Optional
+from .session_manager import SessionManager
+from .rate_limiter import RateLimiter, TieredRateLimiter
 
 # Intentar importar Spacy, pero tener fallback
 try:
@@ -21,12 +23,6 @@ class ChatBot:
         self.matcher = QueryMatcher(synonyms_path)
         self.use_spacy = use_spacy and SPACY_AVAILABLE
         
-<<<<<<< Updated upstream
-=======
-        fallback_threshold: float = 0.25
-        log_low_confidence: bool = False
-        low_confidence_log_path: str = "logs/low_confidence_queries.log"
-
         #Initialize session manager
         self.session_manager = SessionManager(session_timeout=1800)
 
@@ -37,20 +33,11 @@ class ChatBot:
 
         self.rate_limit_violations = 0
 
->>>>>>> Stashed changes
         # Inicializar Spacy si está disponible
         if self.use_spacy:
             self._init_spacy()
         
         self.load_resources()
-
-        self.fallback_threshold = fallback_threshold
-        self.log_low_confidence = log_low_confidence
-        self.low_confidence_log_path = low_confidence_log_path
-
-        # Crear directorio de logs si está habilitado
-        if self.log_low_confidence:
-            os.makedirs(os.path.dirname(low_confidence_log_path), exist_ok=True)
         
         # Configuracion de categorias
         self.category_keywords = {
@@ -82,6 +69,16 @@ class ChatBot:
                            "teléfono", "email", "normas", "reglamento", "acceso"],
                 "peso": 0.7,
                 "exclusivas": ["baño", "wc", "horario", "abrir", "cerrar"]
+            },
+            "biblio": {
+                "palabras": [
+                    "biblio", "asistente", "ayuda", "información", "qué haces", 
+                    "quién eres", "presentación", "bienvenida", "funciones", 
+                    "servicios", "comandos", "preguntar", "como usar", "instrucciones",
+                    "acerca de", "sobre ti", "capacidades", "qué puedes hacer"
+                ],
+                "peso": 0.9,
+                "exclusivas": ["biblio", "asistente", "qué haces", "quién eres"]
             }
         }
         
@@ -93,20 +90,20 @@ class ChatBot:
             
             self.nlp = spacy.load("es_core_news_sm")
             print("✅ Spacy inicializado con modelo 'es_core_news_sm'")
-            print(f"📊 Pipeline disponible: {self.nlp.pipe_names}")
+            print(f" Pipeline disponible: {self.nlp.pipe_names}")
             
             # Configuracion para prevenir los errores de un inicio
             self._setup_spacy_features()
             
         except Exception as e:
             print(f"❌ Error inicializando Spacy: {e}")
-            print("🔧 Continuando sin Spacy")
+            print(" Continuando sin Spacy")
             self.use_spacy = False
     
     def _setup_spacy_features(self):
         """Configura Spacy"""
         # NO deshabilitar componentes, trabajar con lo que el modelo tiene
-        print(f"📊 Usando pipeline existente: {self.nlp.pipe_names}")
+        print(f" Usando pipeline existente: {self.nlp.pipe_names}")
         
         # El modelo español no tiene 'tagger' separado
         # Usa 'morphologizer' para POS tagging
@@ -123,9 +120,30 @@ class ChatBot:
         if components_to_disable:
             for component in components_to_disable:
                 self.nlp.disable_pipe(component)
-            print(f"🔧 Componentes deshabilitados: {components_to_disable}")
-            print(f"📊 Pipeline activo: {self.nlp.pipe_names}")
+            print(f" Componentes deshabilitados: {components_to_disable}")
+            print(f" Pipeline activo: {self.nlp.pipe_names}")
     
+    def check_rate_limit(self, identifier: str) -> tuple:
+        """
+        Asegurarse de que el ID puede hacer preguntas.
+        
+        Args:
+            identifier: User ID/session ID
+            
+        Returns:
+            (allowed, wait_time, remaining)
+            - allowed: Se permite
+            - wait_time: Segundos de enfriamiento si no
+            - remaining: solicitudes restantes
+        """
+        allowed, result = self.rate_limiter.is_allowed(identifier)
+        
+        if allowed:
+            return True, None, result  # result = solicitudes restantes
+        else:
+            self.rate_limit_violations += 1
+            return False, result, 0    # result = segundos de espera
+
     def extract_lemmas_spacy(self, text: str) -> List[str]:
         """Extrae lemas usando Spacy"""
         if not self.use_spacy or not hasattr(self, 'nlp'):
@@ -148,127 +166,181 @@ class ChatBot:
             print(f"⚠️  Error en extract_lemmas_spacy: {e}")
             return []
     
-    def categorize_question(self, question: str) -> Tuple[str, float]:
+    def categorize_question(self, question: str, context_category: str = None) -> Tuple[str, float]:
         """
-        Categoriza la pregunta usando texto NORMALIZADO primero
+        Categoriza la pregunta usando texto NORMALIZADO y contexto de sesión
+        Args:
+            question: La pregunta del usuario (normalizada)
+            context_category: Categoría anterior de la sesión (opcional)
+        Returns:
+            Tuple[str, float]: (categoría, confianza)
         """
-        # Normalizacion de la pregunta primero que nada 
+        # Normalizacion de la pregunta 
         question_normalized = self.matcher.normalize_text(question)
         
         if self.debug_mode:
-            print(f"🔧 Pregunta normalizada: '{question}' → '{question_normalized}'")
+            print(f" Pregunta normalizada: '{question}' → '{question_normalized}'")
+            if context_category:
+                print(f" Contexto: categoría anterior = '{context_category}'")
         
-        # Buscar palabras exclusivas en texto normalizado
+        # Buscar palabras exclusivas (ALTA CONFIANZA)
         for category, data in self.category_keywords.items():
             exclusivas = data.get("exclusivas", [])
             for palabra in exclusivas:
-                # Normalizar tambien la palabra exclusiva para comparar
                 palabra_normalizada = self.matcher.normalize_text(palabra)
                 if palabra_normalizada in question_normalized:
                     if self.debug_mode:
-                        print(f"🔍 Categoría forzada a '{category}' por palabra exclusiva: '{palabra}' → '{palabra_normalizada}'")
+                        print(f" Categoría forzada a '{category}' por palabra exclusiva: '{palabra}' → '{palabra_normalizada}'")
                     return category, 1.0
         
-        # Usar Spacy con texto normalizado 
+        # Spacy para lematización (si está disponible) 
+        spacy_score = 0.0
+        spacy_category = None
+        
         if self.use_spacy:
             try:
-                # Para mejores reaultados se lematiza pregunta original
                 lemmas = self.extract_lemmas_spacy(question)
                 if lemmas:
                     if self.debug_mode:
-                        print(f"🔍 Lemas Spacy: {lemmas}")
+                        print(f" Lemas Spacy: {lemmas}")
                     
-                    # Buscar lemas en palabras clave
                     category_scores = {category: 0.0 for category in self.category_keywords}
                     
                     for category, data in self.category_keywords.items():
                         keywords = data["palabras"]
                         weight = data["peso"]
                         
-                        # Normalizar cada keyword para comparar con lemas
                         keywords_normalizadas = [self.matcher.normalize_text(k) for k in keywords]
                         
                         for lemma in lemmas:
-                            # Normalizar el lemma tambien
                             lemma_normalizado = self.matcher.normalize_text(lemma)
                             if lemma_normalizado in keywords_normalizadas:
                                 category_scores[category] += weight
                                 if self.debug_mode:
                                     print(f"   ✅ Lemma '{lemma}' → '{lemma_normalizado}' coincide con {category}")
                     
-                    # Determinar ganador basado en lemas
                     best_category = max(category_scores, key=category_scores.get)
                     best_score = category_scores[best_category]
                     
                     if best_score > 0:
-                        normalized_score = min(best_score / 5.0, 1.0)
-
+                        spacy_category = best_category
+                        spacy_score = min(best_score / 5.0, 1.0)
+                        
                         if self.debug_mode:
-                            print(f"🏆 Spacy seleccionó: {best_category} (score: {best_score}, conf: {normalized_score:.2f})")
-                        
-                        return best_category, normalized_score
-                        
+                            print(f" Spacy seleccionó: {best_category} (score: {best_score}, conf: {spacy_score:.2f})")
+                            
             except Exception as e:
                 if self.debug_mode:
                     print(f"⚠️  Error en categorización Spacy: {e}")
-                # Continuar con metodo tradicional
         
-        # Metodo tradicional con texto normalizado
+        # Método tradicional con palabras clave
         category_scores = {category: 0.0 for category in self.category_keywords}
         
         for category, data in self.category_keywords.items():
             keywords = data["palabras"]
             weight = data["peso"]
             
-            # Normalizar cada keyword para comparar con pregunta normalizada
             keywords_normalizadas = [self.matcher.normalize_text(k) for k in keywords]
             
             for keyword, keyword_norm in zip(keywords, keywords_normalizadas):
                 if keyword_norm in question_normalized:
-                    # Bonus si la palabra aparece al inicio en texto normalizado
+                    # Bonus si la palabra aparece al inicio
                     if question_normalized.startswith(keyword_norm + " "):
                         category_scores[category] += weight * 1.5
                         if self.debug_mode:
-                            print(f"🚀 Bonus inicio: '{keyword}' → '{keyword_norm}' en {category}")
-
+                            print(f" Bonus inicio: '{keyword}' → '{keyword_norm}' en {category}")
+                    
                     elif f" {keyword_norm} " in question_normalized:
                         category_scores[category] += weight
                         if self.debug_mode:
                             print(f"✅ Coincidencia: '{keyword}' → '{keyword_norm}' en {category}")
-
+                    
                     elif question_normalized.endswith(" " + keyword_norm):
                         category_scores[category] += weight
                         if self.debug_mode:
-                            print(f"📍 Coincidencia final: '{keyword}' → '{keyword_norm}' en {category}")
-
+                            print(f" Coincidencia final: '{keyword}' → '{keyword_norm}' en {category}")
+                    
                     else:
-                        # Palabra como substring si se comio un espacio
+                        # Palabra como substring
                         category_scores[category] += weight * 0.7
                         if self.debug_mode:
                             print(f"🔍 Substring: '{keyword}' → '{keyword_norm}' en {category}")
         
         if self.debug_mode:
-            print(f"\n📊 Puntuaciones finales: {category_scores}")
+            print(f"\n📊 Puntuaciones tradicionales: {category_scores}")
         
-        # Determinar ganador
-        best_category = max(category_scores, key=category_scores.get)
-        best_score = category_scores[best_category]
+        # Combinar resultados de Spacy y método tradicional
+        best_category = None
+        best_score = 0.0
         
-        # Si no hay puntuación significativa, usar general
-        if best_score < 0.5:
+        if spacy_category and spacy_score > 0:
+            # Combinar Spacy (60%) con tradicional (40%)
+            traditional_score = category_scores.get(spacy_category, 0)
+            combined_score = (spacy_score * 0.6) + (min(traditional_score / 10.0, 1.0) * 0.4)
+            
+            best_category = spacy_category
+            best_score = combined_score
+            
             if self.debug_mode:
-                print(f"⚠️  Score bajo ({best_score:.2f}), usando 'general' por defecto")
-            return "general", 0.5
+                print(f" Combinado Spacy: {spacy_category} (score: {combined_score:.2f})")
+        else:
+            # Solo método tradicional
+            best_category = max(category_scores, key=category_scores.get)
+            best_score = category_scores[best_category]
         
-        # Normalizar score
+        # Normalizar score 
         max_possible = sum([data["peso"] * 3 for data in self.category_keywords.values()])
         normalized_score = min(best_score / max_possible, 1.0)
         
         if self.debug_mode:
-            print(f"🏆 Ganador: {best_category} (score: {best_score:.2f}, confianza: {normalized_score:.2f})")
+            print(f" Score normalizado: {normalized_score:.2f}")
+        
+        # Verificar si necesita usar contexto
+        # Si la confianza es baja Y tenemos contexto de sesión
+        if context_category and normalized_score < 0.5:
+            
+            # Palabras que indican seguimiento de conversación
+            followup_indicators = [
+                "y", "tambien", "ademas", "entonces", "eso", "esa", "ese",
+                "y como", "y cuando", "y donde", "y que", "y cuanto",
+                "entonces como", "entonces cuando", "entonces donde",
+                "cual", "que", "cuanto", "como", "donde", "cuando"
+            ]
+            
+            # Detectar si es pregunta de seguimiento
+            is_followup = False
+            question_lower = question_normalized.lower()
+
+            is_short = len(question_normalized.split()) <= 6
+
+            for indicator in followup_indicators:
+                if question_lower.startswith(indicator) or f" {indicator} " in question_lower:
+                    is_followup = True
+                    break
+            
+            # preguntas muy cortas (probablemente seguimiento)
+            if len(question_normalized.split()) <= 5:
+                is_followup = True
+            
+            if is_followup or is_short:
+                if self.debug_mode:
+                    print(f"📌 Detectada pregunta de seguimiento (score bajo: {normalized_score:.2f})")
+                    print(f"   Usando contexto de sesión: '{context_category}'")
+                
+                # Usar la categoría del contexto con confianza moderada
+                return context_category, 0.65
+        
+        # Si no hay puntuación significativa, usar general 
+        if normalized_score < 0.3:
+            if self.debug_mode:
+                print(f"⚠️  Score bajo ({normalized_score:.2f}), usando 'general' por defecto")
+            return "general", 0.5
+        
+        if self.debug_mode:
+            print(f" Ganador: {best_category} (confianza: {normalized_score:.2f})")
         
         return best_category, normalized_score
-
+        
     def extract_entities(self, question: str) -> Dict[str, List[str]]:
         """
         Extraccion de entidades especificas de biblioteca.
@@ -310,7 +382,7 @@ class ChatBot:
         for word in all_words_to_check:
             word_lower = word.lower()
             
-            # Check against base forms
+            # Checar forma base
             if word_lower in location_keywords and word_lower not in entities["locations"]:
                 entities["locations"].append(word_lower)
             elif word_lower in resource_keywords and word_lower not in entities["resources"]:
@@ -407,8 +479,8 @@ class ChatBot:
             print(f"✅ Chatbot inicializado en modo {mode}")
             
             # Mostrar estadísticas
-            print("\n📊 ESTADISTICAS:")
-            for category in ["general", "books", "computers", "cubicles"]:
+            print("\n ESTADISTICAS:")
+            for category in ["general", "books", "computers", "cubicles", "biblio"]:
                 knowledge = self.knowledge_base.get_knowledge(category)
                 if knowledge:
                     print(f"   {category}: {len(knowledge)} reglas")
@@ -418,7 +490,7 @@ class ChatBot:
         except Exception as e:
             print(f"❌ Error cargando recursos: {e}")
 
-            for category in ["general", "books", "computers", "cubicles"]:
+            for category in ["general", "books", "computers", "cubicles", "biblio"]:
                 if not self.knowledge_base.get_knowledge(category):
                     self.knowledge_base.knowledge[category] = {}
     
@@ -438,7 +510,7 @@ class ChatBot:
             else:
                 confidence = self.matcher.calculate_similarity(expanded_queries, data["preguntas"])
             
-            # # Boost para categorías específicas
+            # # Boost para categorías específicas (debug)
             # if category != "general":
             #     confidence *= 1.2
             
@@ -448,54 +520,124 @@ class ChatBot:
         
         return best_answer, best_confidence
     
-    def process_question(self, question: str) -> Dict:
-        """Procesa pregunta usando texto normalizado"""
-        # Validación básica
+    def process_question(self, question: str, session_id: str = None) -> Dict:
+        """
+        Procesa pregunta usando texto normalizado con rate limiting
+        
+        Args:
+            question: Pregunta de usuario
+            session_id: Asignada por programa principal
+
+        Returns:
+            Dict con respuesta y metadatos
+    
+        Raises:
+            ValueError: Si session_id no es proporcionado
+        """
+        
+        if not session_id:
+            # Por si acaso, el programa principal siempre deberia proveer una sesion
+            if self.debug_mode:
+                print(f"❌ ERROR: No se cuenta con un identificador para la sesion")
+            
+            return {
+                "answer": "Error interno: Identificador de sesión no proporcionado. Contacte al administrador.",
+                "confidence": 0.0,
+                "source": "general",
+                "mode": "basic" if not self.use_spacy else "spacy",
+                "session_id": None,
+                "rate_limited": False,
+                "error": "missing_session_id"
+            }
+        
+        # Si no hay identificador (debug)
+        identifier = session_id if session_id else "anonimo"
+
+        allowed, wait_time, remaining = self.check_rate_limit(session_id)
+
+        if not allowed:
+            if self.debug_mode:
+                print(f"⚠️ Se ha excedido el limite para este ID: {identifier}")
+            
+            return {
+                "answer": f"Has realizado demasiadas preguntas. Por favor espera {wait_time} segundos antes de continuar.",
+                "confidence": 0.0,
+                "source": "general",
+                "mode": "basic" if not self.use_spacy else "spacy",
+                "session_id": session_id,
+                "rate_limited": True,
+                "wait_time": wait_time
+            }
+        
+        # Validar entrada
         if not question or not question.strip():
             return {
                 "answer": "Haz una pregunta sobre los servicios de la biblioteca.",
                 "confidence": 0.0,
                 "source": "general",
-                "mode": "basic" if not self.use_spacy else "spacy"
+                "mode": "basic" if not self.use_spacy else "spacy",
+                "session_id": session_id,
+                "rate_limited": False
             }
         
-        # Normalizar la pregunta al inicio para TODO el proceso
+        session = self.session_manager.get_session(session_id)
+
+        if not session:
+            # Redundancia, la sesion se asigna por parte del programa principal
+            if self.debug_mode:
+                print(f"🆕 Creating new session for: {session_id}")
+            
+            self.session_manager.create_session_with_id(session_id)
+            session = self.session_manager.get_session(session_id)
+
+        # Si esta disponible, contexto se toma en cuenta para mejor categorizacion
+        if session.get('last_category'):
+            if self.debug_mode:
+                print(f"📌 Contexto: última categoría fue '{session['last_category']}'")
+        
+        # Normalizar la pregunta al inicio 
         question_for_processing = self.matcher.normalize_text(question)
         
         if self.debug_mode:
             print(f"\n{'='*60}")
-            print(f"🤖 PROCESANDO: '{question}'")
-            print(f"📝 Normalizado: '{question_for_processing}'")
+            print(f" PROCESANDO: '{question}'")
+            print(f" Sesión: {session_id[:8]}..." if len(session_id) > 8 else f" Sesión: {session_id}")
+            print(f" Normalizado: '{question_for_processing}'")
+            if session.get('last_category'):
+                print(f" Contexto: última categoría = '{session['last_category']}'")
             print(f"{'='*60}")
-        
-        # Categorizar con texto normalizado
-        category, category_confidence = self.categorize_question(question_for_processing)
+
+        # Paso de contexto para categoria
+        category, category_confidence = self.categorize_question(
+            question_for_processing,
+            context_category=session.get('last_category')
+        )
         
         if self.debug_mode:
-            print(f"📋 Categoria: {category} (confianza: {category_confidence:.2f})")
+            print(f" Categoria: {category} (confianza: {category_confidence:.2f})")
         
         # Expandir consulta usando texto normalizado
         if self.use_spacy:
             expanded_queries = self.expand_query_with_spacy(question_for_processing)
         else:
-            # Usar la pregunta normalizada
             expanded_queries = self.matcher.expand_with_synonyms(question_for_processing)
         
         if self.debug_mode and expanded_queries:
-            print(f"🔍 Consultas expandidas ({len(expanded_queries)}): {expanded_queries[:3]}...")
+            print(f" Consultas expandidas ({len(expanded_queries)}): {expanded_queries[:3]}...")
         
         # Buscar en categoria principal
         best_answer, best_confidence = self.search_in_category(category, expanded_queries)
         best_source = category
         
         if self.debug_mode:
-            print(f"🎯 Mejor coincidencia en {category}: {best_confidence:.3f}")
+            print(f" Mejor coincidencia en {category}: {best_confidence:.3f}")
         
         # Umbrales por categoria
         category_thresholds = {
             "books": 0.4,
             "computers": 0.4,
             "cubicles": 0.4,
+            "biblio": 0.35,
             "general": 0.3
         }
         
@@ -504,7 +646,7 @@ class ChatBot:
         # Si no supera umbral, buscar en general
         if best_confidence < threshold:
             if self.debug_mode:
-                print(f"⚠️  Confianza baja ({best_confidence:.3f} < {threshold}), probando 'general'...")
+                print(f"⚠️  Confianza baja ({best_confidence:.3f} < {threshold}), probando 'general'")
             
             general_answer, general_confidence = self.search_in_category("general", expanded_queries)
             
@@ -517,43 +659,53 @@ class ChatBot:
                     print(f"🔄 Cambiando a 'general': {general_confidence:.3f}")
         
         # Usar respuesta de fallback 
-        if best_confidence < self.fallback_threshold:
-            if self.debug_mode:
-                print(f"⚠️  Confianza ({best_confidence:.3f}) por debajo del umbral ({self.fallback_threshold})")
-                print("   Activando respuesta 'No sé'")
-            
-            if self.log_low_confidence:
-                self._log_low_confidence(question, session_id, best_confidence, best_source)
-            
-            best_answer = self.get_idk_response()
-            best_confidence = 0.0
-            best_source = "fallback"
+        if best_confidence < 0.25:
+            best_answer = self.get_fallback_response(best_source, question)
+            best_confidence = 0.25
             
             if self.debug_mode:
-                print(f"🆘 Usando respuesta de fallback")
-        
-        # Confianza final
-        final_confidence = min(best_confidence * (0.5 + category_confidence * 0.5), 1.0)
-        
-        if self.debug_mode:
-            print(f"\n📊 RESULTADO FINAL:")
-            print(f"   Respuesta: {best_answer[:80]}...")
-            print(f"   Confianza final: {final_confidence:.3f}")
-            print(f"{'='*60}\n")
+                print(f" Usando respuesta de fallback")
         
         entities = self.extract_entities(question)
+
+        final_confidence = min(best_confidence * (0.5 + category_confidence * 0.5), 1.0)
         
-        return {
+        result = {
             "answer": best_answer,
             "confidence": round(final_confidence, 3),
             "source": best_source,
             "mode": "basic" if not self.use_spacy else "spacy",
-            "entities": entities, 
+            "entities": entities,
+            "session_id": session_id,
+            "rate_limited": False,                    
+            "rate_limit_remaining": remaining,        
             "details": {
                 "category_confidence": round(category_confidence, 3),
-                "expanded_queries_count": len(expanded_queries)
+                "expanded_queries_count": len(expanded_queries),
+                "conversation_count": session.get('conversation_count', 0)
             }
         }
+        
+        # Guardar en el historial de sesion
+        self.session_manager.add_to_history(session_id, question, result)
+        
+        # Actualizar sesion con el contexto reciente
+        self.session_manager.update_session(session_id, {
+            'last_category': best_source,
+            'last_entities': entities,
+            'last_question': question,
+            'last_response': best_answer[:200]
+        })
+        
+        if self.debug_mode:
+            print(f"\n RESULTADO FINAL:")
+            print(f"   Respuesta: {best_answer[:80]}...")
+            print(f"   Confianza: {final_confidence:.3f}")
+            print(f"   Conversación #{session.get('conversation_count', 0)}")
+            print(f"   Rate limit restante: {remaining}/{self.rate_limiter.max_requests}")
+            print(f"{'='*60}\n")
+        
+        return result
     
     def get_fallback_response(self, category: str, question: str = "") -> str:
         """Respuesta de fallback especifica por categoría"""
@@ -569,43 +721,20 @@ class ChatBot:
         if "computadora" in question_lower or "ordenador" in question_lower:
             return "Las computadoras están disponibles por orden de llegada. Máximo 2 horas de uso. Presenta tu carné."
         
+        if any(word in question_lower for word in ["biblio", "asistente", "quién eres", "quien eres", "qué haces", "que haces"]):
+            return "¡Hola! Soy Biblio, tu asistente virtual. Puedo ayudarte con preguntas sobre libros, computadoras, cubículos y servicios de la biblioteca. ¿Qué necesitas saber?"
+
         # Respuestas genericas por categoria
         fallback_responses = {
             "books": "Información sobre libros disponible en recepción. Horario de atención: 8 AM a 6 PM.",
             "computers": "Consulta las reglas de uso de computadoras en el área de tecnología.",
             "cubicles": "Para reservar cubículos, visita la recepción con identificación.",
-            "general": "No he entendido la pregunta, ¿podrías reformularla?."
+            "general": "No he entendido la pregunta, ¿podrías reformularla?.",
+            "biblio": "Soy Biblio, tu asistente. Pregúntame sobre libros, computadoras, cubículos o servicios generales."
         }
         
         return fallback_responses.get(category, fallback_responses["general"])
     
-    def get_idk_response(self) -> str:
-        """respuesta de fallback cuando la confianza es demsasiado baja."""
-        return (
-            "Lo siento, no tengo información suficiente para responder a esa pregunta. "
-            "¿Podrías reformularla o consultar directamente en el mostrador de atención al usuario? "
-            "¡Estaré encantado de ayudarte con otras dudas sobre la biblioteca!"
-        )
-    
-    def _log_low_confidence(self, question: str, session_id: str, confidence: float, attempted_source: str):
-        """Registrar solicitudes de baja confianza a un archivo."""
-        import json
-        from datetime import datetime
-        
-        log_entry = {
-            "timestamp": datetime.now().isoformat(),
-            "session_id": session_id,
-            "question": question,
-            "confidence": round(confidence, 2),
-            "attempted_source": attempted_source
-        }
-        
-        try:
-            with open(self.low_confidence_log_path, 'a', encoding='utf-8') as f:
-                f.write(json.dumps(log_entry, ensure_ascii=False) + '\n')
-        except Exception as e:
-            print(f"⚠️  Error escribiendo log de baja confianza: {e}")
-
     def get_system_info(self) -> Dict:
         """Obtiene información del sistema"""
         categories_info = {}
@@ -638,24 +767,22 @@ def create_chatbot(force_basic: bool = False) -> ChatBot:
     use_spacy = SPACY_AVAILABLE and not force_basic
     
     if use_spacy:
-        print("🚀 Creando chatbot con Spacy...")
+        print(" Creando chatbot con Spacy...")
     else:
-        print("⚡ Creando chatbot en modo básico...")
+        print(" Creando chatbot en modo básico...")
         if SPACY_AVAILABLE and force_basic:
-            print("📝 Nota: Spacy está disponible pero se forzó modo básico")
+            print(" Nota: Spacy está disponible pero se forzó modo básico")
     
     return ChatBot(use_spacy=use_spacy)
 
-# Funcin de diagnostico
 def diagnose_spacy():
-    """Diagnóstico de Spacy"""
+    """Diagnóstico de Spacy (problema de dependencia?)"""
     print("\n" + "="*60)
-    print("🩺 DIAGNÓSTICO DE SPACY")
+    print(" DIAGNÓSTICO DE SPACY")
     print("="*60)
     
     if not SPACY_AVAILABLE:
         print("❌ Spacy no está instalado")
-        print("💡 Solución: pip install spacy")
         return False
     
     print("✅ Spacy está instalado")
@@ -663,13 +790,13 @@ def diagnose_spacy():
     try:
         nlp = spacy.load("es_core_news_sm")
         print("✅ Modelo 'es_core_news_sm' cargado correctamente")
-        print(f"📊 Pipeline: {nlp.pipe_names}")
-        print(f"📊 Vocabulario: {len(nlp.vocab)} palabras")
+        print(f" Pipeline: {nlp.pipe_names}")
+        print(f" Vocabulario: {len(nlp.vocab)} palabras")
         
         # Probar procesamiento
         test_text = "reservar un cubículo"
         doc = nlp(test_text)
-        print(f"\n🧪 Prueba con '{test_text}':")
+        print(f"\n Prueba con '{test_text}':")
         for token in doc:
             print(f"   '{token.text}' → Lemma: '{token.lemma_}', POS: '{token.pos_}'")
         
@@ -677,7 +804,7 @@ def diagnose_spacy():
         
     except Exception as e:
         print(f"❌ Error cargando modelo: {e}")
-        print("💡 Solución: python -m spacy download es_core_news_sm")
+        # Solución: python -m spacy download es_core_news_sm"
         return False
 
 if __name__ == "__main__":
@@ -686,7 +813,7 @@ if __name__ == "__main__":
     
     # Crear y probar chatbot
     print(f"\n{'='*60}")
-    print("🤖 PRUEBA DEL CHATBOT")
+    print("PRUEBA DEL CHATBOT")
     print("="*60)
     
     chatbot = create_chatbot()
@@ -702,4 +829,4 @@ if __name__ == "__main__":
         print(f"\n[{i}] Q: {question}")
         response = chatbot.process_question(question)
         print(f"    A: {response['answer'][:80]}...")
-        print(f"    📍 {response['source']} | 🤖 {response['mode']} | 📊 {response['confidence']}")
+        print(f"    📍 {response['source']} | {response['mode']} | {response['confidence']}")

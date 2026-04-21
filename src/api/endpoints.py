@@ -1,39 +1,69 @@
-<<<<<<< Updated upstream
-from fastapi import APIRouter, HTTPException
-=======
-import os
-from fastapi import APIRouter, HTTPException, Request, Response, Header
->>>>>>> Stashed changes
+from fastapi import APIRouter, HTTPException, Request, Response
 from src.chatbot.core import ChatBot
 from src.models.schemas import ChatRequest, ChatResponse
 
 router = APIRouter(prefix="/chatbot", tags=["chatbot"])
 chatbot = ChatBot()
 
-<<<<<<< Updated upstream
-=======
-ADMIN_TOKEN = os.environ.get("CHATBOT_ADMIN_TOKEN", "PassTest123")
-ENABLE_ADMIN_ENDPOINTS = os.environ.get("ENABLE_ADMIN", "true").lower() == "true"
 
->>>>>>> Stashed changes
 @router.post("/query", response_model=ChatResponse)
-async def process_query(request: ChatRequest):
-    """
-    Endpoint principal para procesar preguntas del usuario
-    """
+async def process_query(request: ChatRequest, response: Response, http_request: Request):
+    """Endpoint principal para procesar preguntas del usuario"""
+    
+    # Validar session_id recibida por programa principal
+    if not request.session_id:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error": "MISSIN_SESSION_ID",
+                "message": "El programa principal debe proveer de session_id para crear la sesion"
+            }
+        )
+
     try:
-        response = chatbot.process_question(request.question)
+        # Validacion de id para sesion, 
+        result = chatbot.process_question(request.question, request.session_id)
+        
+        if result.get("error") == "missing_session_id":
+            raise HTTPException(
+                status_code=400,
+                detail={
+                    "error": "SESSION_ID_REQUIRED",
+                    "message": result["answer"]
+                }
+            )
+        
+        # Manejo de limite de preguntas
+        if result.get("rate_limited"):
+            raise HTTPException(
+                status_code=429,
+                detail={
+                    "error": "TOO_MANY_REQUESTS",
+                    "wait_seconds": result.get("wait_time"),
+                    "message": result["answer"]
+                }
+            )
+        
+        # Rate limit headers para monitoreo
+        response.headers["X-RateLimit-Limit"] = str(chatbot.rate_limiter.max_requests)
+        response.headers["X-RateLimit-Remaining"] = str(result.get("rate_limit_remaining", 2))
+        response.headers["X-RateLimit-Window"] = str(chatbot.rate_limiter.window_seconds)
+        
+        # Session header para debugging
+        response.headers["X-Session-ID"] = result["session_id"]
+        
         return ChatResponse(
             question=request.question,
-            answer=response["answer"],
-            confidence=response["confidence"],
-            source=response["source"],
-            entities=response["entities"]
+            answer=result["answer"],
+            confidence=result["confidence"],
+            source=result["source"],
+            entities=result["entities"],
+            session_id=result["session_id"]
         )
+        
+    except HTTPException:
+        raise
     except Exception as e:
-<<<<<<< Updated upstream
-        raise HTTPException(status_code=500, detail=str(e))
-=======
         raise HTTPException(
             status_code=500, 
             detail={
@@ -116,52 +146,13 @@ async def get_stats():
         "chatbot_mode": "spacy" if chatbot.use_spacy else "basic"
     }
 
-if ENABLE_ADMIN_ENDPOINTS:
-    @router.post("/admin/reload")
-    async def reload_knowledge(admin_token: str = Header(None, alias="Admin-Token")):
-        """
-        Recarga la base de conocimiento desde sin reiniciar el servicio.
-        
-        Requiere el header `Admin-Token` con el token de administración.
-        """
-        # Verificar el token (si está configurado)
-        if ADMIN_TOKEN and admin_token != ADMIN_TOKEN:
-            raise HTTPException(
-                status_code=401,
-                detail={
-                    "error": "UNAUTHORIZED",
-                    "message": "Token de administración inválido o ausente"
-                }
-            )
-        
-        try:
-            # Recargar recursos
-            chatbot.load_resources()
-            
-            # Obtener estadísticas actualizadas
-            categories_info = {}
-            for category in chatbot.category_keywords:
-                knowledge = chatbot.knowledge_base.get_knowledge(category)
-                if knowledge:
-                    categories_info[category] = len(knowledge)
-            
-            return {
-                "status": "success",
-                "message": "Base de conocimiento recargada correctamente",
-                "rules_loaded": categories_info,
-                "synonyms_loaded": len(chatbot.matcher.synonyms) if hasattr(chatbot.matcher, 'synonyms') else 0
-            }
-            
-        except Exception as e:
-            raise HTTPException(
-                status_code=500,
-                detail={
-                    "error": "RELOAD_FAILED",
-                    "message": f"Error al recargar: {str(e)}"
-                }
-            )
->>>>>>> Stashed changes
 
 @router.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "library-chatbot"}
+    """Endpoint para validar comunicacion"""
+    return {
+        "status": "healthy",
+        "service": "library_chatbot",
+        "session_count": chatbot.session_manager.get_active_sessions_count(),
+        "mode": "spacy" if chatbot.use_spacy else "basic"
+    }
