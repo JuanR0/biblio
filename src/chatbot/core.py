@@ -18,15 +18,15 @@ from .matcher import QueryMatcher
 
 class ChatBot:
     def __init__(self, knowledge_path: str = "knowledge/", synonyms_path: str = "synonyms/", use_spacy: bool = True):
-       
-        fallback_threshold: float = 0.25,
-        log_low_confidence: bool = True,
-        low_confidence_log_path: str = "logs/low_confidence_queries.log"
 
         self.knowledge_base = KnowledgeBase(knowledge_path)
         self.matcher = QueryMatcher(synonyms_path)
         self.use_spacy = use_spacy and SPACY_AVAILABLE
         
+        fallback_threshold: float = 0.25
+        log_low_confidence: bool = False
+        low_confidence_log_path: str = "logs/low_confidence_queries.log"
+
         #Initialize session manager
         self.session_manager = SessionManager(session_timeout=1800)
 
@@ -89,7 +89,7 @@ class ChatBot:
                     "servicios", "comandos", "preguntar", "como usar", "instrucciones",
                     "acerca de", "sobre ti", "capacidades", "qué puedes hacer"
                 ],
-                "peso": 0.9,
+                "peso": 0.7,
                 "exclusivas": ["biblio", "asistente", "qué haces", "quién eres"]
             }
         }
