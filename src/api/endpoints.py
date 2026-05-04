@@ -1,10 +1,13 @@
-from fastapi import APIRouter, HTTPException, Request, Response
+import os
+from fastapi import APIRouter, HTTPException, Request, Response, Header
 from src.chatbot.core import ChatBot
 from src.models.schemas import ChatRequest, ChatResponse
 
 router = APIRouter(prefix="/chatbot", tags=["chatbot"])
 chatbot = ChatBot()
 
+ADMIN_TOKEN = os.environ.get("CHATBOT_ADMIN_TOKEN", "PassTest123")
+ENABLE_ADMIN_ENDPOINTS = os.environ.get("ENABLE_ADMIN", "true").lower() == "true"
 
 @router.post("/query", response_model=ChatResponse)
 async def process_query(request: ChatRequest, response: Response, http_request: Request):
@@ -143,9 +146,59 @@ async def get_stats():
             "window_seconds": chatbot.rate_limiter.window_seconds
         },
         "rate_limit_stats": rate_limit_stats,
-        "chatbot_mode": "spacy" if chatbot.use_spacy else "basic"
+        "chatbot_mode": "spacy" if chatbot.use_spacy else "basic",
+        "ml_classifier": {
+            "enabled": chatbot.enable_ml_classifier,
+            "ready": chatbot.ml_ready,
+            "threshold_rule": chatbot.ml_confidence_threshold,
+            "threshold_override": chatbot.ml_override_threshold
+        }
     }
 
+if ENABLE_ADMIN_ENDPOINTS:
+    @router.post("/admin/reload")
+    async def reload_knowledge(admin_token: str = Header(None, alias="Admin-Token")):
+        """
+        Recarga la base de conocimiento sin reiniciar el servicio.
+        
+        Requiere el header `Admin-Token` con el token de administración.
+        """
+        # Verificar el token (si está configurado)
+        if ADMIN_TOKEN and admin_token != ADMIN_TOKEN:
+            raise HTTPException(
+                status_code=401,
+                detail={
+                    "error": "UNAUTHORIZED",
+                    "message": "Token de administración inválido o ausente"
+                }
+            )
+        
+        try:
+            # Recargar recursos
+            chatbot.load_resources()
+            
+            # Obtener estadísticas actualizadas
+            categories_info = {}
+            for category in chatbot.category_keywords:
+                knowledge = chatbot.knowledge_base.get_knowledge(category)
+                if knowledge:
+                    categories_info[category] = len(knowledge)
+            
+            return {
+                "status": "success",
+                "message": "Base de conocimiento recargada correctamente",
+                "rules_loaded": categories_info,
+                "synonyms_loaded": len(chatbot.matcher.synonyms) if hasattr(chatbot.matcher, 'synonyms') else 0
+            }
+            
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail={
+                    "error": "RELOAD_FAILED",
+                    "message": f"Error al recargar: {str(e)}"
+                }
+            )
 
 @router.get("/health")
 async def health_check():
