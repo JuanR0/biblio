@@ -4,6 +4,10 @@ from typing import Dict, List, Tuple, Optional
 from .session_manager import SessionManager
 from .rate_limiter import RateLimiter, TieredRateLimiter
 
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+import pickle  # optional, if you want to save/load model later
+
 # Intentar importar Spacy, pero tener fallback
 try:
     import spacy
@@ -22,10 +26,24 @@ class ChatBot:
         self.knowledge_base = KnowledgeBase(knowledge_path)
         self.matcher = QueryMatcher(synonyms_path)
         self.use_spacy = use_spacy and SPACY_AVAILABLE
-        
+
         fallback_threshold: float = 0.25
         log_low_confidence: bool = False
         low_confidence_log_path: str = "logs/low_confidence_queries.log"
+
+        enable_ml_classifier: bool = True
+        ml_confidence_threshold: float = 0.35   # Rule confidence below this triggers ML
+        ml_override_threshold: float = 0.65 
+
+        self.enable_ml_classifier = enable_ml_classifier
+        self.ml_confidence_threshold = ml_confidence_threshold
+        self.ml_override_threshold = ml_override_threshold
+
+        self.vectorizer = None
+        self.classifier = None
+        self.ml_ready = False
+
+        self.debug_mode = False
 
         #Initialize session manager
         self.session_manager = SessionManager(session_timeout=1800)
@@ -46,6 +64,9 @@ class ChatBot:
         self.fallback_threshold = fallback_threshold
         self.log_low_confidence = log_low_confidence
         self.low_confidence_log_path = low_confidence_log_path
+        
+        if self.enable_ml_classifier:
+            self._train_classifier()
         
         # Crear directorio de logs si está habilitado
         if self.log_low_confidence:
@@ -93,8 +114,6 @@ class ChatBot:
                 "exclusivas": ["biblio", "asistente", "qué haces", "quién eres"]
             }
         }
-        
-        self.debug_mode = False
     
     def _init_spacy(self):
         """Inicializa Spacy si está disponible"""
@@ -670,6 +689,29 @@ class ChatBot:
                 if self.debug_mode:
                     print(f"🔄 Cambiando a 'general': {general_confidence:.3f}")
         
+         # ===== ML CLASSIFIER FALLBACK (Complement to rule-based) =====
+        # Only trigger if rule confidence is low AND ML is enabled AND ready
+        if (self.enable_ml_classifier and self.ml_ready and 
+            best_confidence < self.ml_confidence_threshold):
+            
+            ml_category, ml_confidence = self._ml_categorize(question)
+            
+            if self.debug_mode:
+                print(f"🤖 ML suggests: {ml_category} (conf: {ml_confidence:.3f})")
+            
+            # Only use ML suggestion if it's confident AND differs from current best source
+            if ml_confidence > self.ml_override_threshold and ml_category != best_source:
+                # Search again in ML's suggested category
+                ml_answer, ml_match_conf = self.search_in_category(ml_category, expanded_queries)
+                
+                if ml_match_conf > best_confidence + 0.1:  # Significant improvement
+                    best_answer = ml_answer
+                    best_confidence = ml_match_conf
+                    best_source = ml_category
+                    
+                    if self.debug_mode:
+                        print(f"🔄 ML override: using '{ml_category}' (match conf: {ml_match_conf:.3f})")
+
         # Usar respuesta de fallback 
         if best_confidence < self.fallback_threshold:
             if self.debug_mode:
@@ -724,6 +766,94 @@ class ChatBot:
         
         return result
     
+    def _train_classifier(self):
+        """
+        Train a logistic regression classifier using the questions from the knowledge base.
+        The classifier learns to predict the category (books, computers, etc.) from the text.
+        """
+        try:
+            texts = []
+            labels = []
+            
+            # Extract all questions and their categories from the knowledge base
+            for category, knowledge in self.knowledge_base.knowledge.items():
+                if not knowledge:
+                    continue
+                for rule_id, rule_data in knowledge.items():
+                    for pregunta in rule_data.get("preguntas", []):
+                        # Normalize the question before training
+                        normalized = self.matcher.normalize_text(pregunta)
+                        if normalized and len(normalized) > 3:
+                            texts.append(normalized)
+                            labels.append(category)
+            
+            if len(texts) < 10:
+                print(f"⚠️  ML Classifier: Insufficient training data ({len(texts)} examples). Disabling.")
+                self.ml_ready = False
+                return
+            
+            # Create TF-IDF vectorizer (unigrams + bigrams)
+            self.vectorizer = TfidfVectorizer(
+                analyzer='char_wb',
+                ngram_range=(3, 5),
+                max_features=800,
+                sublinear_tf=True
+            )
+            X = self.vectorizer.fit_transform(texts)
+            
+            # Train logistic regression classifier
+            self.classifier = LogisticRegression(
+                max_iter=1000,
+                random_state=42,
+                class_weight='balanced'
+            )
+            self.classifier.fit(X, labels)
+            
+            self.ml_ready = True
+            print(f"✅ ML Classifier trained on {len(texts)} examples across {len(set(labels))} categories")
+            
+            if self.debug_mode:
+                # Print top features per category (optional)
+                self._print_top_features()
+                
+        except Exception as e:
+            print(f"❌ ML Classifier training failed: {e}")
+            self.ml_ready = False
+    
+    def _ml_categorize(self, question: str) -> Tuple[str, float]:
+        """
+        Use the trained ML classifier to predict the category of a question.
+        Returns (category, confidence) where confidence is the predicted probability.
+        """
+        if not self.ml_ready or self.classifier is None or self.vectorizer is None:
+            return "general", 0.0
+        
+        try:
+            normalized = self.matcher.normalize_text(question)
+            X = self.vectorizer.transform([normalized])
+            
+            predicted_category = self.classifier.predict(X)[0]
+            probabilities = self.classifier.predict_proba(X)[0]
+            confidence = max(probabilities)
+            
+            return predicted_category, confidence
+        except Exception as e:
+            if self.debug_mode:
+                print(f"⚠️  ML prediction error: {e}")
+            return "general", 0.0
+    
+    def _print_top_features(self, n: int = 5):
+        """Print the top n features (words/bigrams) for each category."""
+        if not self.ml_ready:
+            return
+        
+        feature_names = self.vectorizer.get_feature_names_out()
+        for i, category in enumerate(self.classifier.classes_):
+            coef = self.classifier.coef_[i]
+            top_indices = coef.argsort()[-n:][::-1]
+            top_features = [feature_names[idx] for idx in top_indices]
+            print(f"   {category}: {', '.join(top_features)}")
+
     def get_fallback_response(self, category: str, question: str = "") -> str:
         """Respuesta de fallback especifica por categoría"""
         

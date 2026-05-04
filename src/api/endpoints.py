@@ -146,7 +146,13 @@ async def get_stats():
             "window_seconds": chatbot.rate_limiter.window_seconds
         },
         "rate_limit_stats": rate_limit_stats,
-        "chatbot_mode": "spacy" if chatbot.use_spacy else "basic"
+        "chatbot_mode": "spacy" if chatbot.use_spacy else "basic",
+        "ml_classifier": {
+            "enabled": chatbot.enable_ml_classifier,
+            "ready": chatbot.ml_ready,
+            "threshold_rule": chatbot.ml_confidence_threshold,
+            "threshold_override": chatbot.ml_override_threshold
+        }
     }
 
 if ENABLE_ADMIN_ENDPOINTS:
