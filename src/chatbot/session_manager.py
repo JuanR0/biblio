@@ -90,7 +90,7 @@ class SessionManager:
             session['history'] = session['history'][-10:]
         
         session['conversation_count'] += 1
-        session['last_category'] = response['source']
+        # session['last_category'] = response['source']
         session['last_entities'] = response.get('entities', {})
         
         return True

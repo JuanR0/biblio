@@ -70,15 +70,16 @@
     ],
     "respuesta": "Reportalo cuanto antes al personal de la biblioteca, de preferencia en el escritorio donde se te entregó para aclarar la situación lo antes posible."
   },
-  "donde_solicitar_computadoras": {
+  "solicitar_computadoras": {
     "preguntas": [
       "¿donde se solicitan computadoras prestadas?",
       "¿quien me puede prestar una computadora?",
       "necesito saber donde se encuentran las computadoras",
       "¿en que lugar se prestan computadoras?",
-      "necesito una computadora"
+      "necesito una computadora",
+      "cuales son los requisitos para un prestamo de computadora"
     ],
-    "respuesta": "Las computadoras se pueden pedir prestadas en el escritorio de préstamos."
+    "respuesta": "Las computadoras se pueden pedir prestadas en el escritorio de préstamos, es encesario presentar credencial."
   },
   "software_computadoras": {
     "preguntas": [

@@ -43,7 +43,7 @@ class ChatBot:
         self.classifier = None
         self.ml_ready = False
 
-        self.debug_mode = False
+        self.debug_mode = True
 
         #Initialize session manager
         self.session_manager = SessionManager(session_timeout=1800)
@@ -82,11 +82,11 @@ class ChatBot:
                 "exclusivas": ["libro", "texto", "volumen", "novela", "autor"]
             },
             "computers": {
-                "palabras": ["computadora", "ordenador", "pc", "equipo", "software", 
+                "palabras": ["computadora", "ordenador", "pc", "equipo", "software", "laptop",
                            "hardware", "internet", "impresora", "digital", "teclado",
                            "monitor", "programa", "aplicación", "red", "wifi", "online"],
                 "peso": 1.0,
-                "exclusivas": ["computadora", "ordenador", "pc", "software", "hardware"]
+                "exclusivas": ["computadora", "ordenador", "pc", "laptop", "software", "hardware"]
             },
             "cubicles": {
                 "palabras": ["cubiculo", "sala", "espacio", "cabina", "estudio", 
@@ -750,7 +750,7 @@ class ChatBot:
         
         # Actualizar sesion con el contexto reciente
         self.session_manager.update_session(session_id, {
-            'last_category': best_source,
+            'last_category': best_source if best_source != "fallback" else session.get('last_category'),
             'last_entities': entities,
             'last_question': question,
             'last_response': best_answer[:200]

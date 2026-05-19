@@ -7,7 +7,7 @@ app = FastAPI(title="Library Chatbot Microservice")
 # Placeholder CORS, para permitir conexión desde el programa principal principal
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8001"], 
+    allow_origins=["http://localhost:8001", ["*"]], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

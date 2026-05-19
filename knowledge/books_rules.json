@@ -20,6 +20,17 @@
     ],
     "respuesta": "No, debes regresarlo antes de la fecha límite, pero puedes solicitarlo para préstamo nuevamente en ese momento."
   },
+  "reservar_libros": { 
+    "preguntas": [
+      "necesito reservar un libro",
+      "¿que se necesita para reservar un libro?",
+      "¿es posible reservar un libro?",
+      "estoy interesado en reservar un libro",
+      "¿cuales son los requisitos para reservar un libro?",
+      "¿los libros pueden generar multas?"
+    ],
+    "respuesta": "No se pueden reservar libros."
+  },
   "encontrar_libro_danado": {
     "preguntas": [
       "¿que pasa si encuentro un libro danado?",

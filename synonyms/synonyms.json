@@ -1,6 +1,6 @@
 {
   "libro": ["texto", "volumen", "obra", "tomo", "ejemplar"],
-  "computadora": ["ordenador", "pc", "equipo", "máquina", "dispositivo"],
+  "computadora": ["ordenador", "pc", "equipo", "máquina", "dispositivo", "laptop"],
   "cubiculo": ["sala", "cabina", "área", "lugar", "habitación", "recinto", "espacio"],
   "mobiliario": ["silla","mesa","sillon"],
   "prestar": ["llevar", "sacar", "tomar prestado"],
